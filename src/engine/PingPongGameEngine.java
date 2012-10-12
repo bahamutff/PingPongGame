@@ -17,7 +17,7 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	private int ballX;
 	private int ballY;
 	private boolean movingLeft = true;
-	private boolean ballServed = false;
+	private boolean ballServed = true;
 	// «начение вертикального передвижени€ м€ча
 	private int verticalSlide;
 
@@ -91,6 +91,13 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 					if (ballX <= COMPUTER_RACKET_X && canBounce) {
 						movingLeft = false;
 					}
+					// 10 и 200 границы белых линий
+					if (ballY <= 10) {
+						verticalSlide = -1;
+					}
+					if (ballY >= 200) {
+						verticalSlide = 1;
+					}
 				}
 				// ћ€ч движетс€ вправо?
 				if (!movingLeft && ballX <= BALL_MAX_X) {
@@ -100,7 +107,8 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 					ballX += BALL_INCREMENT;
 					table.setBallPosition(ballX, ballY);
 					// ќтскок
-					if (ballX >= PLAYER_RACKET_X && canBounce) {
+					if (ballX >= PLAYER_RACKET_X - 2*RACKET_WIDTH
+							&& canBounce) {
 						movingLeft = true;
 					}
 
@@ -135,6 +143,7 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	// ѕодать м€ч
 	private void playerServe() {
 		ballServed = true;
+		movingLeft = true;
 		ballX = PLAYER_RACKET_X - 1;
 		ballY = playerRacket_Y;
 		if (ballY > TABLE_HEIGHT / 2) {
@@ -147,16 +156,18 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	}
 
 	private void displayScore() {
-		ballServed = false;
 		if (computerScore == WINNING_SCORE) {
 			table.setMessageText("Computer won! " + computerScore + ":"
 					+ playerScore);
+			ballServed = false;
 		} else if (playerScore == WINNING_SCORE) {
 			table.setMessageText("You won!" + playerScore + ":" + computerScore);
+			ballServed = false;
 		} else {
 			table.setMessageText("Computer: " + computerScore + "Player: "
 					+ playerScore);
 		}
+		playerServe();
 	}
 
 	private boolean isBallOnTheTable() {

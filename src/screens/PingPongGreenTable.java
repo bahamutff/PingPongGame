@@ -100,7 +100,8 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		PingPongGreenTable table = new PingPongGreenTable();
 		table.addPaneltoFrame(f.getContentPane());
-		f.setBounds(0, 0, TABLE_WIDTH + 5, TABLE_HEIGHT + 40);
+		f.setBounds(0, 0, TABLE_WIDTH + 15, TABLE_HEIGHT + 55);
+		f.setResizable(false);
 		f.setVisible(true);
 	}
 
