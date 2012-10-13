@@ -96,7 +96,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 
 	public static void main(String[] args) {
 		// Создание окна
-		JFrame f = new JFrame("Ping Pong Green Table");
+		JFrame f = new JFrame("Ping Pong Game");
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		PingPongGreenTable table = new PingPongGreenTable();
 		table.addPaneltoFrame(f.getContentPane());

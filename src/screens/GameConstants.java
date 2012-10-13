@@ -26,5 +26,5 @@ public interface GameConstants {
 	public final int RACKET_WIDTH = 5;
 	public final int WINNING_SCORE = 21;
 	// Задержка для компьютера
-	public final int SLEEP_TIME = 10; // время в милисикундах
+	public final int SLEEP_TIME = 20; // время в милисикундах
 }

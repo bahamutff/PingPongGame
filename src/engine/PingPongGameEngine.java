@@ -4,6 +4,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 
 import screens.*;
 
@@ -18,6 +19,7 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	private int ballY;
 	private boolean movingLeft = true;
 	private boolean ballServed = true;
+	private boolean canServe = false;
 	// «начение вертикального передвижени€ м€ча
 	private int verticalSlide;
 
@@ -44,6 +46,18 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 		table.setPlayerRacket_Y(playerRacket_Y);
 	}
 
+	private void setBounce() {
+		// целое число в диапазоне [-5, 5]
+		Random r = new Random();
+		int k = -5 + r.nextInt(10 + 1);
+		if (k > 0) {
+			verticalSlide = 1;
+		}
+		if (k < 0) {
+			verticalSlide = -1;
+		}
+	}
+
 	// ќб€зательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
@@ -67,6 +81,7 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 		computerScore = 0;
 		playerScore = 0;
 		table.setMessageText("Score Computer: 0 Player: 0");
+		canServe = true;
 		playerServe();
 	}
 
@@ -90,26 +105,22 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 					// ќтскок
 					if (ballX <= COMPUTER_RACKET_X && canBounce) {
 						movingLeft = false;
-					}
-					// 10 и 200 границы белых линий
-					if (ballY <= 10) {
-						verticalSlide = -1;
-					}
-					if (ballY >= 200) {
-						verticalSlide = 1;
+						setBounce();
 					}
 				}
 				// ћ€ч движетс€ вправо?
 				if (!movingLeft && ballX <= BALL_MAX_X) {
-					canBounce = (ballY >= playerRacket_Y
-							&& ballY < (playerRacket_Y + RACKET_LENGTH) ? true
+					canBounce = (ballY >= playerRacket_Y - 5
+							&& ballY < (playerRacket_Y - 5 + RACKET_LENGTH) ? true
 							: false);
 					ballX += BALL_INCREMENT;
+					ballY -= verticalSlide;
 					table.setBallPosition(ballX, ballY);
 					// ќтскок
-					if (ballX >= PLAYER_RACKET_X - 2*RACKET_WIDTH
+					if (ballX >= PLAYER_RACKET_X - 2 * RACKET_WIDTH
 							&& canBounce) {
 						movingLeft = true;
+						setBounce();
 					}
 
 				}
@@ -128,13 +139,24 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 				}
 				// ќбновить счет
 				if (isBallOnTheTable()) {
-					if (ballX > BALL_MAX_X) {
+					if (ballX > BALL_MAX_X && ballX < BALL_MAX_X + 100) {
 						computerScore++;
+						ballX += 100;
+						table.setBallPosition(ballX, ballY);
 						displayScore();
-					} else if (ballX < BALL_MIN_X) {
+					} else if (ballX < BALL_MIN_X && ballX > BALL_MIN_X - 100) {
 						playerScore++;
+						ballX -= 100;
+						table.setBallPosition(ballX, ballY);
 						displayScore();
 					}
+				}
+				// 10 и 200 границы белых линий
+				if (ballY <= 10) {
+					verticalSlide = -1;
+				}
+				if (ballY >= 200) {
+					verticalSlide = 1;
 				}
 			}
 		}
@@ -142,32 +164,29 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 
 	// ѕодать м€ч
 	private void playerServe() {
-		ballServed = true;
-		movingLeft = true;
-		ballX = PLAYER_RACKET_X - 1;
-		ballY = playerRacket_Y;
-		if (ballY > TABLE_HEIGHT / 2) {
-			verticalSlide = -1;
-		} else {
-			verticalSlide = 1;
+		if (canServe) {
+			ballServed = true;
+			movingLeft = true;
+			ballX = PLAYER_RACKET_X - 1;
+			ballY = playerRacket_Y;
+			setBounce();
+			table.setBallPosition(ballX, ballY);
+			table.setPlayerRacket_Y(playerRacket_Y);
+			canServe = false;
 		}
-		table.setBallPosition(ballX, ballY);
-		table.setPlayerRacket_Y(playerRacket_Y);
 	}
 
 	private void displayScore() {
 		if (computerScore == WINNING_SCORE) {
 			table.setMessageText("Computer won! " + computerScore + ":"
 					+ playerScore);
-			ballServed = false;
 		} else if (playerScore == WINNING_SCORE) {
 			table.setMessageText("You won!" + playerScore + ":" + computerScore);
-			ballServed = false;
 		} else {
 			table.setMessageText("Computer: " + computerScore + "Player: "
 					+ playerScore);
 		}
-		playerServe();
+		canServe = true;
 	}
 
 	private boolean isBallOnTheTable() {
