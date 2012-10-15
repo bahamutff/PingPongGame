@@ -51,9 +51,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	void addPaneltoFrame(Container container) {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.add(this);
-		label = new JLabel("Press N - for a new game, B - to back menu");
-		container.add(label);
-		label = new JLabel("S - to serve, Q - to quit");
+		label = new JLabel("Press N - new game, B - back menu, S - serve, Q - quit");
 		container.add(label);
 	}
 
