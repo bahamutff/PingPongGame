@@ -13,11 +13,16 @@ import java.awt.Color;
 import engine.PingPongGameEngine;
 
 public class PingPongGreenTable extends JPanel implements GameConstants {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JLabel label;
 	private int computerRacket_Y = COMPUTER_RACKET_Y_START;
 	private int playerRacket_Y = PLAYER_RACKET_Y_START;
 	private int ballX = BALL_START_X;
 	private int ballY = BALL_START_Y;
+	public static JFrame f;
 
 	Dimension preferredSize = new Dimension(TABLE_WIDTH, TABLE_HEIGHT);
 
@@ -26,19 +31,29 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	}
 
 	// Конструктор
-	PingPongGreenTable() {
+	public PingPongGreenTable() {
 		PingPongGameEngine gameEngine = new PingPongGameEngine(this);
 		// Обработка движений мыши
 		addMouseMotionListener(gameEngine);
 		// Обработка событий клавиатуры
 		addKeyListener(gameEngine);
+		// Создание окна
+		f = new JFrame("Ping Pong Game");
+		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.addPaneltoFrame(f.getContentPane());
+		f.setBounds(0, 0, TABLE_WIDTH + 15, TABLE_HEIGHT + 55);
+		f.setLocationRelativeTo(null);
+		f.setResizable(false);
+		f.setVisible(true);
 	}
 
 	// Добавление панели с JLabel в окно
 	void addPaneltoFrame(Container container) {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.add(this);
-		label = new JLabel("Press N for a new game, S to serve or Q to quit");
+		label = new JLabel("Press N - for a new game, B - to back menu");
+		container.add(label);
+		label = new JLabel("S - to serve, Q - to quit");
 		container.add(label);
 	}
 
@@ -92,17 +107,6 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 		ballX = xPos;
 		ballY = yPos;
 		repaint();
-	}
-
-	public static void main(String[] args) {
-		// Создание окна
-		JFrame f = new JFrame("Ping Pong Game");
-		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		PingPongGreenTable table = new PingPongGreenTable();
-		table.addPaneltoFrame(f.getContentPane());
-		f.setBounds(0, 0, TABLE_WIDTH + 15, TABLE_HEIGHT + 55);
-		f.setResizable(false);
-		f.setVisible(true);
 	}
 
 }

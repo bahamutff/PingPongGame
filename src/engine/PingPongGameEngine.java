@@ -6,6 +6,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
+import Menu.StartMenu;
+
 import screens.*;
 
 public class PingPongGameEngine implements Runnable, MouseMotionListener,
@@ -67,6 +69,8 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 			endGame();
 		} else if ('s' == key || 'S' == key) {
 			playerServe();
+		} else if ('b' == key || 'B' == key) {
+			backToMenu();
 		}
 	}
 
@@ -88,6 +92,12 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	// Завершить игру
 	public void endGame() {
 		System.exit(0);
+	}
+
+	// Вернуться в меню
+	public void backToMenu() {
+		PingPongGreenTable.f.dispose();
+		StartMenu Menu = new StartMenu();
 	}
 
 	public void run() {
