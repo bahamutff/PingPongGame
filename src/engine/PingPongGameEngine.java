@@ -37,14 +37,21 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	};
 
 	public void mouseMoved(MouseEvent e) {
-		int mouse_Y = e.getY();
-		// ѕередвинуть ракетку игрока
-		if (mouse_Y < playerRacket_Y && playerRacket_Y > TABLE_TOP) {
-			playerRacket_Y -= RACKET_INCREMENT;
-		} else if (playerRacket_Y < TABLE_BOTTOM) {
-			playerRacket_Y += RACKET_INCREMENT;
+	};
+
+	public void PlayerRacketMove(String s) {
+		switch (s) {
+		case "Up":
+			if (playerRacket_Y > TABLE_TOP) {
+				playerRacket_Y -= RACKET_INCREMENT;
+			}
+			break;
+		case "Down":
+			if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+				playerRacket_Y += RACKET_INCREMENT;
+			}
+			break;
 		}
-		// ”становить новое положение ракетки
 		table.setPlayerRacket_Y(playerRacket_Y);
 	}
 
@@ -63,7 +70,11 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	// ќб€зательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
-		if ('n' == key || 'N' == key) {
+		if (e.getKeyCode() == e.VK_UP) {
+			PlayerRacketMove("Up");
+		} else if (e.getKeyCode() == e.VK_DOWN) {
+			PlayerRacketMove("Down");
+		} else if ('n' == key || 'N' == key) {
 			startNewGame();
 		} else if ('q' == key || 'Q' == key) {
 			endGame();
@@ -106,36 +117,34 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 			if (ballServed) {
 				// ћ€ч движетс€ влево?
 				if (movingLeft && ballX > BALL_MIN_X) {
-					canBounce = (ballY >= computerRacket_Y
-							&& ballY < (computerRacket_Y + RACKET_LENGTH) ? true
-							: false);
+					canBounce = (ballY >= computerRacket_Y && ballY < (computerRacket_Y + RACKET_LENGTH));
 					ballX -= BALL_INCREMENT;
 					ballY -= verticalSlide;
 					table.setBallPosition(ballX, ballY);
 					// ќтскок
-					if (ballX <= COMPUTER_RACKET_X && canBounce) {
+					if (ballX <= COMPUTER_RACKET_X + RACKET_WIDTH && canBounce) {
 						movingLeft = false;
 						setBounce();
 					}
 				}
 				// ћ€ч движетс€ вправо?
 				if (!movingLeft && ballX <= BALL_MAX_X) {
-					canBounce = (ballY >= playerRacket_Y - 5
-							&& ballY < (playerRacket_Y - 5 + RACKET_LENGTH) ? true
-							: false);
+					canBounce = (ballY >= playerRacket_Y
+							&& ballY <= (playerRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
 					ballX += BALL_INCREMENT;
 					ballY -= verticalSlide;
 					table.setBallPosition(ballX, ballY);
 					// ќтскок
-					if (ballX >= PLAYER_RACKET_X - 2 * RACKET_WIDTH
-							&& canBounce) {
+					if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
 						movingLeft = true;
 						setBounce();
 					}
 
 				}
 				// ѕеремещение компьютера
-				if (computerRacket_Y < ballY && computerRacket_Y < TABLE_BOTTOM) {
+				if (computerRacket_Y < ballY
+						&& computerRacket_Y < TABLE_BOTTOM - RACKET_LENGTH / 2
+								- 10) {
 					computerRacket_Y += RACKET_INCREMENT;
 				} else if (computerRacket_Y > TABLE_TOP) {
 					computerRacket_Y -= RACKET_INCREMENT;
@@ -161,11 +170,10 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 						displayScore();
 					}
 				}
-				// 10 и 200 границы белых линий
-				if (ballY <= 10) {
+				if (ballY <= TABLE_TOP) {
 					verticalSlide = -1;
 				}
-				if (ballY >= 200) {
+				if (ballY >= TABLE_BOTTOM) {
 					verticalSlide = 1;
 				}
 			}
@@ -190,13 +198,16 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 		if (computerScore == WINNING_SCORE) {
 			table.setMessageText("Computer won! " + computerScore + ":"
 					+ playerScore);
+			ballServed = false;
 		} else if (playerScore == WINNING_SCORE) {
 			table.setMessageText("You won!" + playerScore + ":" + computerScore);
+			ballServed = false;
 		} else {
 			table.setMessageText("Computer: " + computerScore + "Player: "
 					+ playerScore);
+			canServe = true;
 		}
-		canServe = true;
+
 	}
 
 	private boolean isBallOnTheTable() {
