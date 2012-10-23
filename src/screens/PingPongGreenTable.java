@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 
 import engine.PingPongGameEngine;
+import engine.PingPongVSEngine;
 
 public class PingPongGreenTable extends JPanel implements GameConstants {
 	/**
@@ -19,6 +20,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	private static final long serialVersionUID = 1L;
 	private JLabel label;
 	private int computerRacket_Y = COMPUTER_RACKET_Y_START;
+	//private int player2Racket_Y = PLAYER2_RACKET_Y_START;
 	private int playerRacket_Y = PLAYER_RACKET_Y_START;
 	private int ballX = BALL_START_X;
 	private int ballY = BALL_START_Y;
@@ -32,7 +34,8 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 
 	// Конструктор
 	public PingPongGreenTable() {
-		PingPongGameEngine gameEngine = new PingPongGameEngine(this);
+		//PingPongGameEngine gameEngine = new PingPongGameEngine(this);
+		PingPongVSEngine gameEngine = new PingPongVSEngine(this);
 		// Обработка движений мыши
 		addMouseMotionListener(gameEngine);
 		// Обработка событий клавиатуры
@@ -67,7 +70,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 		g.fillRect(PLAYER_RACKET_X, playerRacket_Y, RACKET_WIDTH, RACKET_LENGTH);
 		// Левая ракетка
 		g.setColor(Color.blue);
-		g.fillRect(COMPUTER_RACKET_X, computerRacket_Y, RACKET_WIDTH,
+		g.fillRect(LEFT_RACKET_X, computerRacket_Y, RACKET_WIDTH,
 				RACKET_LENGTH);
 		// Белые линии
 		g.setColor(Color.white);
@@ -84,6 +87,12 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	// Установить положение ракетки игрока
 	public void setPlayerRacket_Y(int yCoordinate) {
 		this.playerRacket_Y = yCoordinate;
+		repaint();
+	}
+	
+	// Установить положение ракетки игрока 2
+	public void setPlayer2Racket_Y(int yCoordinate) {
+		this.computerRacket_Y = yCoordinate;
 		repaint();
 	}
 

@@ -22,13 +22,19 @@ public interface GameConstants {
 	public final int BALL_START_X = WINDOW_WIDTH / 2;
 	public final int BALL_START_Y = WINDOW_HEIGHT / 2;
 	// Размеры, разположение и шаг ракеток
-	public final int PLAYER_RACKET_X = WINDOW_WIDTH - 30;
-	public final int PLAYER_RACKET_Y_START = WINDOW_HEIGHT / 2;
-	public final int COMPUTER_RACKET_X = 15;
-	public final int COMPUTER_RACKET_Y_START = WINDOW_HEIGHT / 2;
 	public final int RACKET_INCREMENT = 5;
 	public final int RACKET_LENGTH = 40;
 	public final int RACKET_WIDTH = 5;
+	// Player 1
+	public final int PLAYER_RACKET_X = WINDOW_WIDTH - 30;
+	public final int PLAYER_RACKET_Y_START = WINDOW_HEIGHT / 2;
+	// Left Racket
+	public final int LEFT_RACKET_X = 15;
+	// Computer
+	public final int COMPUTER_RACKET_Y_START = WINDOW_HEIGHT / 2;
+	// Player 2
+	public final int PLAYER2_RACKET_Y_START = WINDOW_HEIGHT / 2;
+	// Кол-во очков для победы
 	public final int WINNING_SCORE = 21;
 	// Задержка для компьютера
 	public final int SLEEP_TIME = 5; // время в милисикундах

@@ -92,7 +92,7 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	}
 
 	// Начать новую игру
-	public void startNewGame() {
+	private void startNewGame() {
 		computerScore = 0;
 		playerScore = 0;
 		table.setMessageText("Score Computer: 0 Player: 0");
@@ -111,71 +111,94 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 		StartMenu Menu = new StartMenu();
 	}
 
+	private void goLeft(boolean canBounce) {
+		if (movingLeft && ballX > BALL_MIN_X) {
+			canBounce = (ballY >= computerRacket_Y && ballY < (computerRacket_Y + RACKET_LENGTH));
+			ballX -= BALL_INCREMENT;
+			ballY -= verticalSlide;
+			table.setBallPosition(ballX, ballY);
+			// Отскок
+			if (ballX <= LEFT_RACKET_X + RACKET_WIDTH && canBounce) {
+				movingLeft = false;
+				setBounce();
+			}
+		}
+	}
+
+	private void goRight(boolean canBounce) {
+		if (!movingLeft && ballX <= BALL_MAX_X) {
+			canBounce = (ballY >= playerRacket_Y
+					&& ballY <= (playerRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
+			ballX += BALL_INCREMENT;
+			ballY -= verticalSlide;
+			table.setBallPosition(ballX, ballY);
+			// Отскок
+			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
+				movingLeft = true;
+				setBounce();
+			}
+		}
+	}
+
+	private void computerMove() {
+		if (computerRacket_Y < ballY
+				&& computerRacket_Y < TABLE_BOTTOM - RACKET_LENGTH / 2 - 10) {
+			computerRacket_Y += RACKET_INCREMENT;
+		} else if (computerRacket_Y > TABLE_TOP) {
+			computerRacket_Y -= RACKET_INCREMENT;
+		}
+		table.setComputerRacket_Y(computerRacket_Y);
+	}
+
+	public void setDelay() {
+		try {
+			Thread.sleep(SLEEP_TIME);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void updateScore() {
+		if (isBallOnTheTable()) {
+			if (ballX > BALL_MAX_X && ballX < BALL_MAX_X + 100) {
+				computerScore++;
+				ballX += 100;
+				table.setBallPosition(ballX, ballY);
+				displayScore();
+			} else if (ballX <= BALL_MIN_X && ballX > BALL_MIN_X - 100) {
+				playerScore++;
+				ballX -= 100;
+				table.setBallPosition(ballX, ballY);
+				displayScore();
+			}
+		}
+	}
+
+	private void ballBounce() {
+		if (ballY <= TABLE_TOP) {
+			verticalSlide = -1;
+		}
+		if (ballY >= TABLE_BOTTOM) {
+			verticalSlide = 1;
+		}
+	}
+
 	public void run() {
 		boolean canBounce = false;
 		while (true) {
 			if (ballServed) {
 				// Мяч движется влево?
-				if (movingLeft && ballX > BALL_MIN_X) {
-					canBounce = (ballY >= computerRacket_Y && ballY < (computerRacket_Y + RACKET_LENGTH));
-					ballX -= BALL_INCREMENT;
-					ballY -= verticalSlide;
-					table.setBallPosition(ballX, ballY);
-					// Отскок
-					if (ballX <= COMPUTER_RACKET_X + RACKET_WIDTH && canBounce) {
-						movingLeft = false;
-						setBounce();
-					}
-				}
+				goLeft(canBounce);
 				// Мяч движется вправо?
-				if (!movingLeft && ballX <= BALL_MAX_X) {
-					canBounce = (ballY >= playerRacket_Y
-							&& ballY <= (playerRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
-					ballX += BALL_INCREMENT;
-					ballY -= verticalSlide;
-					table.setBallPosition(ballX, ballY);
-					// Отскок
-					if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
-						movingLeft = true;
-						setBounce();
-					}
-
-				}
+				goRight(canBounce);
 				// Перемещение компьютера
-				if (computerRacket_Y < ballY
-						&& computerRacket_Y < TABLE_BOTTOM - RACKET_LENGTH / 2
-								- 10) {
-					computerRacket_Y += RACKET_INCREMENT;
-				} else if (computerRacket_Y > TABLE_TOP) {
-					computerRacket_Y -= RACKET_INCREMENT;
-				}
-				table.setComputerRacket_Y(computerRacket_Y);
+				computerMove();
 				// Приостановить
-				try {
-					Thread.sleep(SLEEP_TIME);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				setDelay();
 				// Обновить счет
-				if (isBallOnTheTable()) {
-					if (ballX > BALL_MAX_X && ballX < BALL_MAX_X + 100) {
-						computerScore++;
-						ballX += 100;
-						table.setBallPosition(ballX, ballY);
-						displayScore();
-					} else if (ballX < BALL_MIN_X && ballX > BALL_MIN_X - 100) {
-						playerScore++;
-						ballX -= 100;
-						table.setBallPosition(ballX, ballY);
-						displayScore();
-					}
-				}
-				if (ballY <= TABLE_TOP) {
-					verticalSlide = -1;
-				}
-				if (ballY >= TABLE_BOTTOM) {
-					verticalSlide = 1;
-				}
+				updateScore();
+				// Отскок мяча
+				ballBounce();
 			}
 		}
 	}
@@ -203,8 +226,8 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 			table.setMessageText("You won!" + playerScore + ":" + computerScore);
 			ballServed = false;
 		} else {
-			table.setMessageText("Computer: " + computerScore + "Player: "
-					+ playerScore);
+			table.setMessageText("Computer: " + computerScore + "   "
+					+ "Player: " + playerScore);
 			canServe = true;
 		}
 
