@@ -14,13 +14,11 @@ import engine.PingPongGameEngine;
 import engine.PingPongVSEngine;
 
 public class PingPongGreenTable extends JPanel implements GameConstants {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private JLabel label;
-	private int computerRacket_Y = COMPUTER_RACKET_Y_START;
-	//private int player2Racket_Y = PLAYER2_RACKET_Y_START;
+	private int player2Racket_Y = PLAYER2_RACKET_Y_START;
+	// private int player2Racket_Y = PLAYER2_RACKET_Y_START;
 	private int playerRacket_Y = PLAYER_RACKET_Y_START;
 	private int ballX = BALL_START_X;
 	private int ballY = BALL_START_Y;
@@ -33,13 +31,20 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	}
 
 	// Конструктор
-	public PingPongGreenTable() {
-		//PingPongGameEngine gameEngine = new PingPongGameEngine(this);
-		PingPongVSEngine gameEngine = new PingPongVSEngine(this);
-		// Обработка движений мыши
-		addMouseMotionListener(gameEngine);
-		// Обработка событий клавиатуры
-		addKeyListener(gameEngine);
+	public PingPongGreenTable(boolean isTraining) {
+		if (isTraining) {
+			PingPongGameEngine trainingEngine = new PingPongGameEngine(this);
+			// Обработка движений мыши
+			addMouseMotionListener(trainingEngine);
+			// Обработка событий клавиатуры
+			addKeyListener(trainingEngine);
+		} else {
+			PingPongVSEngine gameEngine = new PingPongVSEngine(this);
+			// Обработка движений мыши
+			addMouseMotionListener(gameEngine);
+			// Обработка событий клавиатуры
+			addKeyListener(gameEngine);
+		}
 		// Создание окна
 		f = new JFrame("Ping Pong Game");
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -70,8 +75,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 		g.fillRect(PLAYER_RACKET_X, playerRacket_Y, RACKET_WIDTH, RACKET_LENGTH);
 		// Левая ракетка
 		g.setColor(Color.blue);
-		g.fillRect(LEFT_RACKET_X, computerRacket_Y, RACKET_WIDTH,
-				RACKET_LENGTH);
+		g.fillRect(LEFT_RACKET_X, player2Racket_Y, RACKET_WIDTH, RACKET_LENGTH);
 		// Белые линии
 		g.setColor(Color.white);
 		g.drawRect(TABLE_LEFT, TABLE_TOP, TABLE_RIGHT, TABLE_BOTTOM);
@@ -89,10 +93,10 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 		this.playerRacket_Y = yCoordinate;
 		repaint();
 	}
-	
+
 	// Установить положение ракетки игрока 2
 	public void setPlayer2Racket_Y(int yCoordinate) {
-		this.computerRacket_Y = yCoordinate;
+		this.player2Racket_Y = yCoordinate;
 		repaint();
 	}
 
@@ -102,7 +106,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	}
 
 	public void setComputerRacket_Y(int yCoordinate) {
-		this.computerRacket_Y = yCoordinate;
+		this.player2Racket_Y = yCoordinate;
 		repaint();
 	}
 

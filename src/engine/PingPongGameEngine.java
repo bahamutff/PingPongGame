@@ -6,7 +6,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
-import Menu.StartMenu;
+import Menu.Menu;
 
 import screens.*;
 
@@ -39,14 +39,14 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	public void mouseMoved(MouseEvent e) {
 	};
 
-	public void PlayerRacketMove(String s) {
-		switch (s) {
-		case "Up":
+	public void PlayerRacketMove(int direction) {
+		switch (direction) {
+		case 1:
 			if (playerRacket_Y > TABLE_TOP) {
 				playerRacket_Y -= RACKET_INCREMENT;
 			}
 			break;
-		case "Down":
+		case -1:
 			if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
 				playerRacket_Y += RACKET_INCREMENT;
 			}
@@ -70,10 +70,13 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	// Обязательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
+		// Направление движения ракетки игрока
+		int directionUp = 1;
+		int directionDown = -1;
 		if (e.getKeyCode() == e.VK_UP) {
-			PlayerRacketMove("Up");
+			PlayerRacketMove(directionUp);
 		} else if (e.getKeyCode() == e.VK_DOWN) {
-			PlayerRacketMove("Down");
+			PlayerRacketMove(directionDown);
 		} else if ('n' == key || 'N' == key) {
 			startNewGame();
 		} else if ('q' == key || 'Q' == key) {
@@ -108,7 +111,8 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 	// Вернуться в меню
 	public void backToMenu() {
 		PingPongGreenTable.f.dispose();
-		StartMenu Menu = new StartMenu();
+		boolean isStartMenu = true;
+		new Menu(isStartMenu);
 	}
 
 	private void goLeft(boolean canBounce) {
