@@ -1,17 +1,13 @@
 package engine;
 
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
-import Menu.Menu;
-
+import Menu.*;
 import screens.*;
 
-public class PingPongGameEngine implements Runnable, MouseMotionListener,
-		KeyListener, GameConstants {
+public class PingPongGameEngine implements Runnable, KeyListener, GameConstants {
 	private PingPongGreenTable table;
 	private int playerRacket_Y = PLAYER_RACKET_Y_START;
 	private int computerRacket_Y = COMPUTER_RACKET_Y_START;
@@ -31,13 +27,6 @@ public class PingPongGameEngine implements Runnable, MouseMotionListener,
 		Thread worker = new Thread(this);
 		worker.start();
 	}
-
-	// Обязательные методы из интерфейса MouseMotionListener
-	public void mouseDragged(MouseEvent e) {
-	};
-
-	public void mouseMoved(MouseEvent e) {
-	};
 
 	public void PlayerRacketMove(int direction) {
 		switch (direction) {

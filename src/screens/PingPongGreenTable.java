@@ -34,14 +34,10 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	public PingPongGreenTable(boolean isTraining) {
 		if (isTraining) {
 			PingPongGameEngine trainingEngine = new PingPongGameEngine(this);
-			// Обработка движений мыши
-			addMouseMotionListener(trainingEngine);
 			// Обработка событий клавиатуры
 			addKeyListener(trainingEngine);
 		} else {
 			PingPongVSEngine gameEngine = new PingPongVSEngine(this);
-			// Обработка движений мыши
-			addMouseMotionListener(gameEngine);
 			// Обработка событий клавиатуры
 			addKeyListener(gameEngine);
 		}
