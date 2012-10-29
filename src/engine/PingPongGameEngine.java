@@ -100,8 +100,8 @@ public class PingPongGameEngine implements Runnable, KeyListener, GameConstants 
 	// Вернуться в меню
 	public void backToMenu() {
 		PingPongGreenTable.f.dispose();
-		boolean isStartMenu = true;
-		new Menu(isStartMenu);
+		int codeMenu = 0;
+		new Menu(codeMenu);
 	}
 
 	private void goLeft(boolean canBounce) {

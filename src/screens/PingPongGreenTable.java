@@ -10,8 +10,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Color;
 
-import engine.PingPongGameEngine;
-import engine.PingPongVSEngine;
+import engine.*;
 
 public class PingPongGreenTable extends JPanel implements GameConstants {
 
@@ -31,18 +30,31 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	}
 
 	// Конструктор
-	public PingPongGreenTable(boolean isTraining) {
-		if (isTraining) {
+	public PingPongGreenTable(int codeEngine) {
+		if (codeEngine == 0) {
 			PingPongGameEngine trainingEngine = new PingPongGameEngine(this);
 			// Обработка событий клавиатуры
 			addKeyListener(trainingEngine);
-		} else {
+			f = new JFrame("Ping Pong Training");
+		} else if (codeEngine == 1) {
 			PingPongVSEngine gameEngine = new PingPongVSEngine(this);
 			// Обработка событий клавиатуры
 			addKeyListener(gameEngine);
+			f = new JFrame("Ping Pong VS Game");
+		} else if (codeEngine == 2) {
+			PingPongServerEngine serverGameEngine = new PingPongServerEngine(
+					this);
+			// Обработка событий клавиатуры
+			addKeyListener(serverGameEngine);
+			f = new JFrame("Ping Pong Server");
+		} else if (codeEngine == 3) {
+			PingPongServerEngine clientGameEngine = new PingPongServerEngine(
+					this);
+			// Обработка событий клавиатуры
+			addKeyListener(clientGameEngine);
+			f = new JFrame("Ping Pong Client");
 		}
 		// Создание окна
-		f = new JFrame("Ping Pong Game");
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.addPaneltoFrame(f.getContentPane());
 		f.setBounds(0, 0, WINDOW_WIDTH - 2, WINDOW_HEIGHT + 55);// !!!!!!!!!!!!!!!!

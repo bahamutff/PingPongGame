@@ -22,9 +22,10 @@ public class Server {
 						new OutputStreamWriter(socket.getOutputStream())), true);
 				while (true) {
 					String str = in.readLine();
-					if (str.equals("END"))
+					int data = Integer.parseInt(str);
+					if (data == -1)
 						break;
-					System.out.println("Echoing: " + str);
+					System.out.println("Echoing: " + data);
 					out.println(str);
 				}
 				// Всегда закрываем два сокета...

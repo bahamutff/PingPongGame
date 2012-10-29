@@ -15,8 +15,17 @@ public class Client {
 		// InetAddress.getByName("127.0.0.1");
 		// InetAddress addr =
 		// InetAddress.getByName("localhost");
+		Socket socket = null;
 		System.out.println("addr = " + addr);
-		Socket socket = new Socket(addr, Server.PORT);
+		boolean serverFound = false;
+		while (!serverFound) {
+			try {
+				socket = new Socket(addr, Server.PORT);
+				serverFound = true;
+			} catch (ConnectException e) {
+			} finally {
+			}
+		}
 		// Помещаем все в блок try-finally, чтобы
 		// быть уверенным, что сокет закроется:
 		try {
@@ -27,11 +36,12 @@ public class Client {
 			PrintWriter out = new PrintWriter(new BufferedWriter(
 					new OutputStreamWriter(socket.getOutputStream())), true);
 			for (int i = 0; i < 10; i++) {
-				out.println("howdy " + i);
+				out.println(i);
 				String str = in.readLine();
-				System.out.println(str);
+				int data = Integer.parseInt(str);
+				System.out.println(data);
 			}
-			out.println("END");
+			out.println(-1);
 		} finally {
 			System.out.println("closing...");
 			socket.close();

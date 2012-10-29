@@ -14,32 +14,51 @@ public class MenuEngine implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		JButton clickedButton = (JButton) e.getSource();
+		// Переменная передается в конструктор для выбора движка
+		int codeEngine;
+		// Переменная передается в конструктор для выбора меню
+		int codeMenu;
 		// Start Menu
 		if (clickedButton == parent.startGame) {
 			parent.fStartMenu.dispose();
-			boolean isStartMenu = false;
-			new Menu(isStartMenu);
+			codeMenu = 1;
+			new Menu(codeMenu);
 		} else if (clickedButton == parent.lanGame) {
-
+			parent.fStartMenu.dispose();
+			codeMenu = 2;
+			new Menu(codeMenu);
 		} else if (clickedButton == parent.optionGame) {
 
 		} else if (clickedButton == parent.exitGame) {
 			System.exit(0);
 		}
 		// Mode Select
-		boolean isTraining;
 		if (clickedButton == parent.training) {
 			parent.fModeSelection.dispose();
-			isTraining = true;
-			new PingPongGreenTable(isTraining);
+			codeEngine = 0;
+			new PingPongGreenTable(codeEngine);
 		} else if (clickedButton == parent.vsMode) {
 			parent.fModeSelection.dispose();
-			isTraining = false;
-			new PingPongGreenTable(isTraining);
+			codeEngine = 1;
+			new PingPongGreenTable(codeEngine);
 		} else if (clickedButton == parent.back) {
 			parent.fModeSelection.dispose();
-			boolean isStartMenu = true;
-			new Menu(isStartMenu);
+			codeMenu = 0;
+			new Menu(codeMenu);
+		}
+		// Lan option
+		if (clickedButton == parent.server) {
+			parent.fLanSelection.dispose();
+			codeEngine = 2;
+			new PingPongGreenTable(codeEngine);
+		} else if (clickedButton == parent.client) {
+			parent.fLanSelection.dispose();
+			codeEngine = 3;
+			new PingPongGreenTable(codeEngine);
+		} else if (clickedButton == parent.backOutLan) {
+			parent.fLanSelection.dispose();
+			codeMenu = 0;
+			new Menu(codeMenu);
 		}
 	}
 
