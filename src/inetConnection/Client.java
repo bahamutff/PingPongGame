@@ -3,18 +3,14 @@ package inetConnection;
 import java.net.*;
 import java.io.*;
 
+import screens.GameConstants.*;
+
 public class Client {
-	public static void main(String[] args) throws IOException {
-		// ѕередаем null в getByName(), получа€
-		// специальный IP адрес "локальной заглушки"
-		// дл€ тестировани€ на машине без сети:
+	static PrintWriter out;
+	static BufferedReader in;
+
+	public static Socket createClient() throws IOException {
 		InetAddress addr = InetAddress.getByName(null);
-		// јльтернативно, вы можете использовать
-		// адрес или им€:
-		// InetAddress addr =
-		// InetAddress.getByName("127.0.0.1");
-		// InetAddress addr =
-		// InetAddress.getByName("localhost");
 		Socket socket = null;
 		System.out.println("addr = " + addr);
 		boolean serverFound = false;
@@ -26,25 +22,68 @@ public class Client {
 			} finally {
 			}
 		}
-		// ѕомещаем все в блок try-finally, чтобы
-		// быть уверенным, что сокет закроетс€:
-		try {
-			System.out.println("socket = " + socket);
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
-			// ¬ывод автоматически Output быталкиваетс€ PrintWriter'ом.
-			PrintWriter out = new PrintWriter(new BufferedWriter(
-					new OutputStreamWriter(socket.getOutputStream())), true);
-			for (int i = 0; i < 10; i++) {
-				out.println(i);
-				String str = in.readLine();
-				int data = Integer.parseInt(str);
-				System.out.println(data);
-			}
-			out.println(-1);
-		} finally {
-			System.out.println("closing...");
-			socket.close();
-		}
+		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+				socket.getOutputStream())), true);
+		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		return socket;
 	}
+
+	public static void sendRequestServer(Socket socket, char data)
+			throws IOException {
+		out.println(data);
+	}
+
+	public static void sendIntServer(Socket socket, int data)
+			throws IOException {
+		// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
+		out.println(data);
+	}
+
+	public static int getIntServer(Socket socket) throws IOException {
+		int data = 0;
+		try {
+			String str = in.readLine();
+			data = Integer.parseInt(str);
+		} catch (ConnectException e) {
+			socket.close();
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		}
+		return data;
+	}
+
+	// методы передачи и получени€ необходимых данных с сервера
+	public static Coord getBall(Socket socket) throws IOException {
+		sendRequestServer(socket, 'b'); // символ 'b' означает запрос
+		// координат м€ча
+		int x = getIntServer(socket);
+		System.out.println(x);
+		int y = getIntServer(socket);
+		System.out.println(y);
+		Coord ball = new Coord(x, y);
+		return ball;
+	}
+
+	public static int getServerY(Socket socket) throws IOException {
+		sendRequestServer(socket, 'p'); // символ 'p' означает запрос
+		// y координаты соперника
+		int y = getIntServer(socket);
+		return y;
+	}
+
+	public static void sendClientY(Socket socket, int y) throws IOException {
+		sendRequestServer(socket, 'i'); // символ 'i' означает запрос на
+										// передачу
+		// y координаты игрока
+		sendIntServer(socket, y);
+	}
+
+	public static Score getScore(Socket socket) throws IOException {
+		sendRequestServer(socket, 's'); // символ 's' означает запрос
+		// текущего счета
+		int scoreClient = getIntServer(socket);
+		int scoreServer = getIntServer(socket);
+		Score score = new Score(scoreClient, scoreServer);
+		return score;
+	}
+
 } // /:~

@@ -38,4 +38,27 @@ public interface GameConstants {
 	public final int WINNING_SCORE = 21;
 	// Задержка для компьютера
 	public final int SLEEP_TIME = 1; // время в милисикундах
+
+	// Координаты
+	class Coord {
+		public int x;
+		public int y;
+
+		public Coord(int initX, int initY) {
+			x = initX;
+			y = initY;
+		}
+	}
+
+	// Счет
+	class Score {
+		public int scoreClient;// счет текущего игрока
+		public int scoreServer;// счет соперника
+
+		public Score(int initScoreClient, int initScoreServer) {
+			scoreClient = initScoreClient;
+			scoreServer = initScoreServer;
+		}
+
+	}
 }

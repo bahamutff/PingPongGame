@@ -2,6 +2,8 @@ package Menu;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 import javax.swing.JButton;
 import screens.PingPongGreenTable;
 
@@ -36,11 +38,21 @@ public class MenuEngine implements ActionListener {
 		if (clickedButton == parent.training) {
 			parent.fModeSelection.dispose();
 			codeEngine = 0;
-			new PingPongGreenTable(codeEngine);
+			try {
+				new PingPongGreenTable(codeEngine);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (clickedButton == parent.vsMode) {
 			parent.fModeSelection.dispose();
 			codeEngine = 1;
-			new PingPongGreenTable(codeEngine);
+			try {
+				new PingPongGreenTable(codeEngine);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (clickedButton == parent.back) {
 			parent.fModeSelection.dispose();
 			codeMenu = 0;
@@ -50,11 +62,21 @@ public class MenuEngine implements ActionListener {
 		if (clickedButton == parent.server) {
 			parent.fLanSelection.dispose();
 			codeEngine = 2;
-			new PingPongGreenTable(codeEngine);
+			try {
+				new PingPongGreenTable(codeEngine);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (clickedButton == parent.client) {
 			parent.fLanSelection.dispose();
 			codeEngine = 3;
-			new PingPongGreenTable(codeEngine);
+			try {
+				new PingPongGreenTable(codeEngine);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (clickedButton == parent.backOutLan) {
 			parent.fLanSelection.dispose();
 			codeMenu = 0;

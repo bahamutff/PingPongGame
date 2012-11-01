@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Color;
+import java.io.IOException;
 
 import engine.*;
 
@@ -30,7 +31,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	}
 
 	// Конструктор
-	public PingPongGreenTable(int codeEngine) {
+	public PingPongGreenTable(int codeEngine) throws IOException {
 		if (codeEngine == 0) {
 			PingPongGameEngine trainingEngine = new PingPongGameEngine(this);
 			// Обработка событий клавиатуры
@@ -48,7 +49,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 			addKeyListener(serverGameEngine);
 			f = new JFrame("Ping Pong Server");
 		} else if (codeEngine == 3) {
-			PingPongServerEngine clientGameEngine = new PingPongServerEngine(
+			PingPongClientEngine clientGameEngine = new PingPongClientEngine(
 					this);
 			// Обработка событий клавиатуры
 			addKeyListener(clientGameEngine);
