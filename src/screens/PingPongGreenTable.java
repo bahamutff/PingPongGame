@@ -33,7 +33,7 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	// Конструктор
 	public PingPongGreenTable(int codeEngine) throws IOException {
 		if (codeEngine == 0) {
-			PingPongGameEngine trainingEngine = new PingPongGameEngine(this);
+			PingPongTrainingEngine trainingEngine = new PingPongTrainingEngine(this);
 			// Обработка событий клавиатуры
 			addKeyListener(trainingEngine);
 			f = new JFrame("Ping Pong Training");

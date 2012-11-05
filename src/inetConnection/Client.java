@@ -86,4 +86,8 @@ public class Client {
 		return score;
 	}
 
+	public static void sendServe(Socket socket) throws IOException {
+		sendRequestServer(socket, 'g');
+	}
+
 } // /:~
