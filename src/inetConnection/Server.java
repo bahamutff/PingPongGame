@@ -3,6 +3,8 @@ package inetConnection;
 import java.io.*;
 import java.net.*;
 
+import screens.Message;
+
 public class Server {
 	// ¬ыбираем порт вне пределов 1-1024:
 	public static final int PORT = 8080;
@@ -14,8 +16,10 @@ public class Server {
 		System.out.println("Started: " + s);
 		Socket socket = null;
 		try {
+			Message.waitMessage();
 			// Ѕлокирует до тех пор, пока не возникнет соединение:
 			socket = s.accept();
+			Message.closeWaitMessage();
 		} catch (ConnectException e) {
 			s.close();
 			socket.close();

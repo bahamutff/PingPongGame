@@ -18,7 +18,6 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	private static final long serialVersionUID = 1L;
 	private JLabel label;
 	private int player2Racket_Y = PLAYER2_RACKET_Y_START;
-	// private int player2Racket_Y = PLAYER2_RACKET_Y_START;
 	private int playerRacket_Y = PLAYER_RACKET_Y_START;
 	private int ballX = BALL_START_X;
 	private int ballY = BALL_START_Y;
@@ -33,7 +32,8 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	// Конструктор
 	public PingPongGreenTable(int codeEngine) throws IOException {
 		if (codeEngine == 0) {
-			PingPongTrainingEngine trainingEngine = new PingPongTrainingEngine(this);
+			PingPongTrainingEngine trainingEngine = new PingPongTrainingEngine(
+					this);
 			// Обработка событий клавиатуры
 			addKeyListener(trainingEngine);
 			f = new JFrame("Ping Pong Training");
@@ -43,17 +43,17 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 			addKeyListener(gameEngine);
 			f = new JFrame("Ping Pong VS Game");
 		} else if (codeEngine == 2) {
+			f = new JFrame("Ping Pong Server");
 			PingPongServerEngine serverGameEngine = new PingPongServerEngine(
 					this);
 			// Обработка событий клавиатуры
 			addKeyListener(serverGameEngine);
-			f = new JFrame("Ping Pong Server");
 		} else if (codeEngine == 3) {
+			f = new JFrame("Ping Pong Client");
 			PingPongClientEngine clientGameEngine = new PingPongClientEngine(
 					this);
 			// Обработка событий клавиатуры
 			addKeyListener(clientGameEngine);
-			f = new JFrame("Ping Pong Client");
 		}
 		// Создание окна
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -122,7 +122,6 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 	// Установить игровое сообщение
 	public void setMessageText(String text) {
 		label.setText(text);
-		repaint();
 	}
 
 	public void setBallPosition(int xPos, int yPos) {

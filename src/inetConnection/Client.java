@@ -4,17 +4,55 @@ import java.net.*;
 import java.io.*;
 
 import screens.GameConstants.*;
+import screens.Message;
+import java.util.TimerTask;
 
 public class Client {
 	static PrintWriter out;
 	static BufferedReader in;
+	// Work timer
+	static int timerUpdate;
+	static boolean timeOut;
 
 	public static Socket createClient() throws IOException {
+		// Timer update
+		final java.util.Timer timerSearchUpdate = new java.util.Timer();
+		TimerTask update = new TimerTask() {
+			public void run() {
+				timerUpdate--;
+				if (timerUpdate >= 0) {
+					Message.updateSearchMessage(timerUpdate);
+				}
+			}
+		};
+
+		// Time search
+		final java.util.Timer timerSearch = new java.util.Timer();
+		TimerTask closeSearch = new TimerTask() {
+			public void run() {
+				Message.closeSearchMessage();
+				timerSearchUpdate.cancel();
+				timerSearch.cancel();
+				timeOut = true;
+			}
+		};
+
+		Message.searchMessage();
 		InetAddress addr = InetAddress.getByName(null);
 		Socket socket = null;
 		System.out.println("addr = " + addr);
 		boolean serverFound = false;
+		// Timer search
+		timeOut = false;
+		timerSearch.schedule(closeSearch, 10 * 1000); // 10 sec
+		// Timer update
+		timerUpdate = 10;
+		timerSearchUpdate.schedule(update, 0, 1 * 1000); // 1 sec
 		while (!serverFound) {
+			if (timeOut) {
+				socket = null;
+				return socket;
+			}
 			try {
 				socket = new Socket(addr, Server.PORT);
 				serverFound = true;
@@ -22,6 +60,8 @@ public class Client {
 			} finally {
 			}
 		}
+		Message.closeSearchMessage();
+		timerSearchUpdate.cancel();
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				socket.getOutputStream())), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
