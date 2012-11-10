@@ -11,7 +11,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.io.IOException;
 
-import engine.*;
+import gameEngine.*;
 
 public class PingPongGreenTable extends JPanel implements GameConstants {
 

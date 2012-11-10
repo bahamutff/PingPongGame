@@ -4,8 +4,9 @@ import java.net.*;
 import java.io.*;
 
 import screens.GameConstants.*;
-import screens.Message;
 import java.util.TimerTask;
+
+import message.Message;
 
 public class Client {
 	static PrintWriter out;
@@ -62,6 +63,7 @@ public class Client {
 		}
 		Message.closeSearchMessage();
 		timerSearchUpdate.cancel();
+		timerSearch.cancel();
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				socket.getOutputStream())), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

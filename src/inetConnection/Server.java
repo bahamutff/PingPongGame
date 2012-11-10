@@ -1,31 +1,59 @@
 package inetConnection;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
 import java.net.*;
+import java.util.TimerTask;
 
-import screens.Message;
+import message.Message;
 
-public class Server {
+public class Server{
 	// ¬ыбираем порт вне пределов 1-1024:
 	public static final int PORT = 8080;
 	static BufferedReader in;
 	static PrintWriter out;
+	static boolean timeOut;
 
 	public static Socket createServer() throws IOException {
-		ServerSocket s = new ServerSocket(PORT);
+		final ServerSocket s = new ServerSocket(PORT);
+
+		// Timer for close waitnig client
+		final java.util.Timer timerClose = new java.util.Timer();
+		TimerTask closeWaiting = new TimerTask() {
+			public void run() {
+				System.out.println("KO");
+				try {
+					s.close();
+					timerClose.cancel();
+					timeOut = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		timeOut = false;
+		timerClose.schedule(closeWaiting, 10 * 1000); // 10 sec
 		System.out.println("Started: " + s);
 		Socket socket = null;
+		Message.waitMessage();
 		try {
-			Message.waitMessage();
 			// Ѕлокирует до тех пор, пока не возникнет соединение:
 			socket = s.accept();
-			Message.closeWaitMessage();
+			timerClose.cancel();
 		} catch (ConnectException e) {
 			s.close();
 			socket.close();
 			// !!!!!!!!!!!!!!
 		} finally {
-			s.close();
+			Message.closeWaitMessage();
+			System.out.println("Finally");
+			if (!timeOut) {
+				s.close();
+			} else {
+				return null;
+			}
 		}
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
@@ -81,6 +109,19 @@ public class Server {
 			throws IOException {
 		sendIntClient(socket, scoreClient);
 		sendIntClient(socket, scoreServer);
+	}
+
+	public void keyPressed(KeyEvent e) {
+		char key = e.getKeyChar();
+		if ('b' == key || 'B' == key) {
+			System.out.println("lololo");
+		}
+	}
+
+	public void keyReleased(KeyEvent e) {
+	}
+
+	public void keyTyped(KeyEvent e) {
 	}
 
 } // /:~
