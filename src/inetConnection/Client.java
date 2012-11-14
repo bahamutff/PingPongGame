@@ -72,25 +72,33 @@ public class Client {
 
 	public static void sendRequestServer(Socket socket, char data)
 			throws IOException {
-		out.println(data);
+		if (!socket.isClosed()) {
+			out.println(data);
+		}
 	}
 
 	public static void sendIntServer(Socket socket, int data)
 			throws IOException {
-		// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
-		out.println(data);
+		if (!socket.isClosed()) {
+			// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
+			out.println(data);
+		}
 	}
 
 	public static int getIntServer(Socket socket) throws IOException {
 		int data = 0;
-		try {
-			String str = in.readLine();
-			data = Integer.parseInt(str);
-		} catch (ConnectException e) {
-			socket.close();
-			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		if (!socket.isClosed()) {
+			try {
+				String str = in.readLine();
+				data = Integer.parseInt(str);
+			} catch (Exception e) {
+				socket.close();
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			}
+			return data;
+		} else {
+			return 0;
 		}
-		return data;
 	}
 
 	// методы передачи и получени€ необходимых данных с сервера

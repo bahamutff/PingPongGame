@@ -1,14 +1,13 @@
 package inetConnection;
 
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.*;
 import java.net.*;
 import java.util.TimerTask;
 
 import message.Message;
 
-public class Server{
+public class Server {
 	// ¬ыбираем порт вне пределов 1-1024:
 	public static final int PORT = 8080;
 	static BufferedReader in;
@@ -63,32 +62,42 @@ public class Server{
 
 	public static void sendIntClient(Socket socket, int data)
 			throws IOException {
-		// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
-		out.println(data);
+		if (!socket.isClosed()) {
+			// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
+			out.println(data);
+		}
 	}
 
 	public static int getIntClient(Socket socket) throws IOException {
 		int data = 0;
-		try {
-			String str = in.readLine();
-			data = Integer.parseInt(str);
-		} catch (ConnectException e) {
-			socket.close();
-			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		if (!socket.isClosed()) {
+			try {
+				String str = in.readLine();
+				data = Integer.parseInt(str);
+			} catch (Exception e) {
+				socket.close();
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			}
+			return data;
+		} else {
+			return 0;
 		}
-		return data;
 	}
 
 	public static char getRequestClient(Socket socket) throws IOException {
 		char data = 0;
-		try {
-			String str = in.readLine();
-			data = str.charAt(0);
-		} catch (ConnectException e) {
-			socket.close();
-			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		if (!socket.isClosed()) {
+			try {
+				String str = in.readLine();
+				data = str.charAt(0);
+			} catch (Exception e) {
+				socket.close();
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			}
+			return data;
+		} else {
+			return 0;
 		}
-		return data;
 	}
 
 	// методы передачи и получени€ необходимых данных с клиента
