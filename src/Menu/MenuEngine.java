@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 import screens.PingPongGreenTable;
 
 public class MenuEngine implements ActionListener {
@@ -70,18 +72,59 @@ public class MenuEngine implements ActionListener {
 			}
 		} else if (clickedButton == parent.client) {
 			parent.fLanSelection.dispose();
-			codeEngine = 3;
-			try {
-				new PingPongGreenTable(codeEngine);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			codeMenu = 3;
+			new Menu(codeMenu);
 		} else if (clickedButton == parent.backOutLan) {
 			parent.fLanSelection.dispose();
 			codeMenu = 0;
 			new Menu(codeMenu);
 		}
+		// Ip option
+		if (clickedButton == parent.confirm) {
+			if (isIP(parent.getIp.getText())) {
+				parent.IP = parent.getIp.getText();
+				parent.fGetIp.dispose();
+				codeEngine = 3;
+				try {
+					new PingPongGreenTable(codeEngine);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+				}
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Error IP address. Please try again");
+			}
+		} else if (clickedButton == parent.backOutIp) {
+			parent.fGetIp.dispose();
+			codeMenu = 0;
+			new Menu(codeMenu);
+		}
 	}
 
+	boolean isIP(String IP) {
+		String testDigit = "";
+		int numbPoints = 0;
+		for (int i = 0; i < IP.length(); i++) {
+			if (i > 15) {
+				return false;
+			}
+			if (IP.charAt(i) >= '0' && IP.charAt(i) <= '9') {
+				testDigit += IP.charAt(i);
+			} else if (IP.charAt(i) == '.') {
+				numbPoints++;
+				if (numbPoints > 3) {
+					return false;
+				}
+				if (Integer.parseInt(testDigit) >= 0
+						&& Integer.parseInt(testDigit) <= 255) {
+					testDigit = "";
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
 }

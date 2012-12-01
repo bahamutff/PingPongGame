@@ -7,6 +7,7 @@ import screens.GameConstants.*;
 import java.util.TimerTask;
 
 import message.Message;
+import menu.Menu;
 
 public class Client {
 	static PrintWriter out;
@@ -39,15 +40,15 @@ public class Client {
 		};
 
 		Message.searchMessage();
-		InetAddress addr = InetAddress.getByName(null);
+		InetAddress addr = InetAddress.getByName(Menu.IP);
 		Socket socket = null;
 		System.out.println("addr = " + addr);
 		boolean serverFound = false;
 		// Timer search
 		timeOut = false;
-		timerSearch.schedule(closeSearch, 10 * 1000); // 10 sec
+		timerSearch.schedule(closeSearch, 20 * 1000); // 20 sec
 		// Timer update
-		timerUpdate = 10;
+		timerUpdate = 20;
 		timerSearchUpdate.schedule(update, 0, 1 * 1000); // 1 sec
 		while (!serverFound) {
 			if (timeOut) {
@@ -57,7 +58,7 @@ public class Client {
 			try {
 				socket = new Socket(addr, Server.PORT);
 				serverFound = true;
-			} catch (ConnectException e) {
+			} catch (Exception e) {
 			} finally {
 			}
 		}

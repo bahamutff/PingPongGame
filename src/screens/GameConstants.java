@@ -37,7 +37,7 @@ public interface GameConstants {
 	// Кол-во очков для победы
 	public final int WINNING_SCORE = 21;
 	// Задержка для компьютера
-	public final int SLEEP_TIME = 1; // время в милисикундах
+	public final int SLEEP_TIME = 3; // время в милисикундах
 
 	// Координаты
 	class Coord {

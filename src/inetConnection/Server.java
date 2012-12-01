@@ -1,6 +1,5 @@
 package inetConnection;
 
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.*;
 import java.util.TimerTask;
@@ -26,8 +25,7 @@ public class Server {
 					s.close();
 					timerClose.cancel();
 					timeOut = true;
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (Exception e) {
 				}
 			}
 		};
@@ -41,7 +39,7 @@ public class Server {
 			// Ѕлокирует до тех пор, пока не возникнет соединение:
 			socket = s.accept();
 			timerClose.cancel();
-		} catch (ConnectException e) {
+		} catch (Exception e) {
 			s.close();
 			socket.close();
 			// !!!!!!!!!!!!!!
@@ -118,19 +116,6 @@ public class Server {
 			throws IOException {
 		sendIntClient(socket, scoreClient);
 		sendIntClient(socket, scoreServer);
-	}
-
-	public void keyPressed(KeyEvent e) {
-		char key = e.getKeyChar();
-		if ('b' == key || 'B' == key) {
-			System.out.println("lololo");
-		}
-	}
-
-	public void keyReleased(KeyEvent e) {
-	}
-
-	public void keyTyped(KeyEvent e) {
 	}
 
 } // /:~
