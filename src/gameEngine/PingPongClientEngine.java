@@ -141,6 +141,12 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 			case 'n':
 				startNewGame();
 				break;
+			case '+':
+				verticalSlide = 1;
+				break;
+			case '-':
+				verticalSlide = -1;
+				break;
 			case 'e':
 				socket.close();
 				break;
@@ -150,7 +156,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				ballY = serverRacket_Y;
 				table.setPlayerRacket_Y(serverRacket_Y);
 				table.setBallPosition(ballX, ballY);
-				setBounce();
+				setServe();
 				canServe = false;
 				break;
 			}
@@ -164,7 +170,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 					getRequest.cancel();
 				}
 			};
-			System.out.println("000000");
 			timerR.schedule(getRequest, 0);
 		}
 	}
@@ -226,7 +231,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 					canServe = false;
 				}
 				table.setBallPosition(ballX, ballY);
-				setBounce();
 				canServe = false;
 			}
 		} else if ('b' == key || 'B' == key) {
@@ -263,7 +267,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		ballY = serverRacket_Y;
 		table.setPlayerRacket_Y(serverRacket_Y);
 		table.setBallPosition(ballX, ballY);
-		setBounce();
 		canServe = false;
 		ballServed = true;
 	}
@@ -289,7 +292,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void setBounce() {
+	private void setServe() {
 		// целое число в диапазоне [-5, 5]
 		Random r = new Random();
 		int k = -5 + r.nextInt(10 + 1);
@@ -301,12 +304,13 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void ballBounce() {
+	private void ballBounce(boolean canBounce) {
 		if (ballY <= TABLE_TOP) {
 			verticalSlide = -1;
-		}
-		if (ballY >= TABLE_BOTTOM) {
+		} else if (ballY >= TABLE_BOTTOM) {
 			verticalSlide = 1;
+		} else if (canBounce) {
+			verticalSlide *= -1;
 		}
 	}
 
@@ -320,7 +324,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		// Отскок
 		if (ballX <= LEFT_RACKET_X + RACKET_WIDTH && canBounce) {
 			movingLeft = false;
-			setBounce();
+			ballBounce(canBounce);
 		}
 	}
 
@@ -334,7 +338,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 			// Отскок
 			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
 				movingLeft = true;
-				setBounce();
+				ballBounce(canBounce);
 			}
 		}
 	}
@@ -368,7 +372,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				// Обновить счет
 				updateScore();
 				// Отскок мяча
-				ballBounce();
+				ballBounce(false);
 			}
 		}
 	};

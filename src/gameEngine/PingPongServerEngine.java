@@ -126,11 +126,9 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 					};
 					timer.schedule(goUp, 0, timeMove);
 					startTimer = true;
-					pressUp = true;
-				} else if (pressUp) {
+				} else {
 					goUp.cancel();
 					startTimer = false;
-					pressUp = false;
 				}
 				break;
 			case 'd':
@@ -145,11 +143,9 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 					};
 					timer.schedule(goDown, 0, timeMove);
 					startTimer = true;
-					pressDown = true;
-				} else if (pressDown) {
+				} else {
 					goDown.cancel();
 					startTimer = false;
-					pressDown = false;
 				}
 				break;
 			case 'g':
@@ -182,7 +178,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void setBounce() {
+	private void setServe() {
 		// целое число в диапазоне [-5, 5]
 		Random r = new Random();
 		int k = -5 + r.nextInt(10 + 1);
@@ -200,6 +196,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		if (e.getKeyCode() == e.VK_UP) {
 			if (!startTimerS) {
 				startTimerS = true;
+				pressUp = true;
 				goUpS = new TimerTask() {
 					public void run() {
 						if (serverRacket_Y > TABLE_TOP) {
@@ -214,6 +211,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		} else if (e.getKeyCode() == e.VK_DOWN) {
 			if (!startTimerS) {
 				startTimerS = true;
+				pressDown = true;
 				goDownS = new TimerTask() {
 					public void run() {
 						if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
@@ -240,15 +238,17 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 	}
 
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == e.VK_UP) {
+		if ((e.getKeyCode() == e.VK_UP) && pressUp) {
 			goUpS.cancel();
 			Server.serverUp(socket);
 			startTimerS = false;
+			pressUp = false;
 		}
-		if (e.getKeyCode() == e.VK_DOWN) {
+		if ((e.getKeyCode() == e.VK_DOWN) && pressDown) {
 			goDownS.cancel();
 			Server.serverDown(socket);
 			startTimerS = false;
+			pressDown = false;
 		}
 	}
 
@@ -296,7 +296,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		// Отскок
 		if (ballX <= LEFT_RACKET_X + RACKET_WIDTH && canBounce) {
 			movingLeft = false;
-			setBounce();
+			ballBounce(canBounce);
 		}
 	}
 
@@ -310,7 +310,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 			// Отскок
 			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
 				movingLeft = true;
-				setBounce();
+				ballBounce(canBounce);
 			}
 		}
 	}
@@ -334,12 +334,13 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void ballBounce() {
+	private void ballBounce(boolean canBounce) {
 		if (ballY <= TABLE_TOP) {
 			verticalSlide = -1;
-		}
-		if (ballY >= TABLE_BOTTOM) {
+		} else if (ballY >= TABLE_BOTTOM) {
 			verticalSlide = 1;
+		} else if (canBounce) {
+			verticalSlide *= -1;
 		}
 	}
 
@@ -355,7 +356,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 				// Обновить счет
 				updateScore();
 				// Отскок мяча
-				ballBounce();
+				ballBounce(false);
 			}
 		}
 	};
@@ -403,7 +404,12 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 				table.setPlayer2Racket_Y(clientRacket_Y);
 			}
 			table.setBallPosition(ballX, ballY);
-			setBounce();
+			setServe();
+			if (verticalSlide > 0) {
+				Server.sendDir(socket, '+');
+			} else {
+				Server.sendDir(socket, '-');
+			}
 			canServe = false;
 		}
 	}

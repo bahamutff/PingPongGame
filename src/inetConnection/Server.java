@@ -146,4 +146,11 @@ public class Server {
 		}
 	}
 
+	public static void sendDir(Socket socket, char dir) {
+		try {
+			sendRequestClient(socket, dir);
+		} catch (IOException e) {
+		}
+	}
+
 } // /:~
