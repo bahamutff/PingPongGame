@@ -37,7 +37,11 @@ public interface GameConstants {
 	// Кол-во очков для победы
 	public final int WINNING_SCORE = 21;
 	// Задержка для компьютера
-	public final int SLEEP_TIME = 3; // время в милисикундах
+	public final int SLEEP_TIME = 3; // время в милисекундах
+	// Скорость движение ракеток в милисекундах
+	public final int timeMove = 20; // 0.02 sec
+	// Скорость движение мяча в милисекундах
+	public final int ballSpeed = 1; // 0.001 sec
 
 	// Координаты
 	class Coord {
@@ -48,17 +52,5 @@ public interface GameConstants {
 			x = initX;
 			y = initY;
 		}
-	}
-
-	// Счет
-	class Score {
-		public int scoreClient;// счет текущего игрока
-		public int scoreServer;// счет соперника
-
-		public Score(int initScoreClient, int initScoreServer) {
-			scoreClient = initScoreClient;
-			scoreServer = initScoreServer;
-		}
-
 	}
 }

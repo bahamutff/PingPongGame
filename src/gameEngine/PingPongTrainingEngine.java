@@ -6,8 +6,6 @@ import java.util.Random;
 import java.util.TimerTask;
 
 import menu.*;
-import message.Message;
-
 import screens.*;
 
 public class PingPongTrainingEngine implements Runnable, KeyListener,
@@ -23,7 +21,6 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 	private boolean ballServed = true;
 	private boolean canServe = false;
 	private boolean startTimer = false;
-	private final int timeMove = 30; // 0.03 sec
 	// «начение вертикального передвижени€ м€ча
 	private int verticalSlide;
 

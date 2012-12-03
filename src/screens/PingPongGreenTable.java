@@ -56,7 +56,8 @@ public class PingPongGreenTable extends JPanel implements GameConstants {
 			addKeyListener(clientGameEngine);
 		}
 		// Создание окна
-		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		// f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		f.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addPaneltoFrame(f.getContentPane());
 		f.setBounds(0, 0, WINDOW_WIDTH - 2, WINDOW_HEIGHT + 55);// !!!!!!!!!!!!!!!!
 		f.setLocationRelativeTo(null);

@@ -6,7 +6,6 @@ import java.awt.Label;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class Message {
 	// Search server
@@ -48,13 +47,15 @@ public class Message {
 		searchMessage.setVisible(false);
 	}
 
-	public static void waitMessage() {
+	public static void waitMessage(String ip) {
 		if (waitWasCreate) {
 			waitMessage.setVisible(true);
 		} else {
 			JPanel messageContent = new JPanel();
-			GridLayout gr = new GridLayout(2, 1);
+			GridLayout gr = new GridLayout(3, 1);
 			messageContent.setLayout(gr);
+			waitingMessage = new Label(ip, Label.CENTER);
+			messageContent.add(waitingMessage);
 			waitingMessage = new Label("Wait client...", Label.CENTER);
 			waitingMessage.setFont(new Font("Serif", Font.PLAIN, 40));
 			messageContent.add(waitingMessage);

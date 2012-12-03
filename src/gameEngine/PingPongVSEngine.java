@@ -24,7 +24,6 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 	// Нажаты одновременно 2 клавиши
 	private boolean startTimer1 = false;
 	private boolean startTimer2 = false;
-	private final int timeMove = 20; // 0.02 sec
 	// Значение вертикального передвижения мяча
 	private int verticalSlide;
 

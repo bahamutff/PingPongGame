@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.TimerTask;
 
 import message.Message;
+import inetConnection.GetIp;
 
 public class Server {
 	// ¬ыбираем порт вне пределов 1-1024:
@@ -20,7 +21,6 @@ public class Server {
 		final java.util.Timer timerClose = new java.util.Timer();
 		TimerTask closeWaiting = new TimerTask() {
 			public void run() {
-				System.out.println("KO");
 				try {
 					s.close();
 					timerClose.cancel();
@@ -34,7 +34,7 @@ public class Server {
 		timerClose.schedule(closeWaiting, 10 * 1000); // 10 sec
 		System.out.println("Started: " + s);
 		Socket socket = null;
-		Message.waitMessage();
+		Message.waitMessage(GetIp.getIP());
 		try {
 			// Ѕлокирует до тех пор, пока не возникнет соединение:
 			socket = s.accept();
@@ -66,6 +66,14 @@ public class Server {
 		}
 	}
 
+	public static void sendRequestClient(Socket socket, char data)
+			throws IOException {
+		if (!socket.isClosed()) {
+			// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
+			out.println(data);
+		}
+	}
+
 	public static int getIntClient(Socket socket) throws IOException {
 		int data = 0;
 		if (!socket.isClosed()) {
@@ -83,18 +91,13 @@ public class Server {
 	}
 
 	public static char getRequestClient(Socket socket) throws IOException {
+		String str = in.readLine();
 		char data = 0;
-		if (!socket.isClosed()) {
-			try {
-				String str = in.readLine();
-				data = str.charAt(0);
-			} catch (Exception e) {
-				socket.close();
-				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
+		if (str != null) {
+			data = str.charAt(0);
 			return data;
 		} else {
-			return 0;
+			return data;
 		}
 	}
 
@@ -108,14 +111,39 @@ public class Server {
 		return getIntClient(socket);
 	}
 
-	public static void sendServerY(Socket socket, int y) throws IOException {
-		sendIntClient(socket, y);
+	public static void serverUp(Socket socket) {
+		try {
+			sendRequestClient(socket, 'u');
+		} catch (IOException e) {
+		}
 	}
 
-	public static void sendScore(Socket socket, int scoreClient, int scoreServer)
-			throws IOException {
-		sendIntClient(socket, scoreClient);
-		sendIntClient(socket, scoreServer);
+	public static void serverDown(Socket socket) {
+		try {
+			sendRequestClient(socket, 'd');
+		} catch (IOException e) {
+		}
+	}
+
+	public static void startNewGame(Socket socket) {
+		try {
+			Server.sendRequestClient(socket, 'n');
+		} catch (IOException e) {
+		}
+	}
+
+	public static void serverExit(Socket socket) {
+		try {
+			Server.sendRequestClient(socket, 'e');
+		} catch (IOException e) {
+		}
+	}
+
+	public static void sendServe(Socket socket) {
+		try {
+			sendRequestClient(socket, 'g');
+		} catch (IOException e) {
+		}
 	}
 
 } // /:~

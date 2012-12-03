@@ -3,6 +3,7 @@ package gameEngine;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
+import java.util.TimerTask;
 
 import java.io.*;
 import java.net.*;
@@ -12,6 +13,7 @@ import javax.swing.JOptionPane;
 import menu.Menu;
 
 import screens.*;
+import inetConnection.Client;
 import inetConnection.Server;
 
 public class PingPongServerEngine implements Runnable, KeyListener,
@@ -26,18 +28,24 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 	private boolean movingLeft = true;
 	private boolean ballServed = true;
 	private boolean canServe = false;
+	boolean canBounce = false;
 	private boolean clientServe = false;
+	//
+	private boolean pressUp = false;
+	private boolean pressDown = false;
 	private boolean isActive = true;
 	// Параметр который не допускает начала новой игры пока не завершилась
 	// текущая
 	private boolean gameRun = false;
-	// Нажатие клавиш
-	private boolean serverPressUp = false;
-	private boolean serverPressDown = false;
 	// Значение вертикального передвижения мяча
 	private int verticalSlide;
 	// server socket
 	Socket socket = null;
+	// Timer
+	private boolean startTimer = false;
+	private boolean startTimerS = false;
+	// Request
+	private char request = 0;
 
 	// Конструктор
 	public PingPongServerEngine(PingPongGreenTable greenTable)
@@ -48,50 +56,122 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		worker.start();
 	}
 
-	// Server works
-	public void workServer(Socket socket) throws IOException {
-		char request = Server.getRequestClient(socket);
-		System.out.println(request);
-		switch (request) {
-		case 'b':
-			Server.sendBall(socket, ballX, ballY);
-			System.out.println("Server.sendBall(socket, ballX, ballY);");
-			break;
-		case 'p':
-			Server.sendServerY(socket, serverRacket_Y);
-			System.out.println("Server.sendServerY(socket, playerRacket_Y);");
-			break;
-		case 'i':
-			clientRacket_Y = Server.getClientY(socket);
-			table.setPlayer2Racket_Y(clientRacket_Y);
-			System.out.println("player2Racket_Y = Server.getClientY(socket);");
-			break;
-		case 's':
-			Server.sendScore(socket, clientScore, serverScore);
-			System.out
-					.println("Server.sendScore(socket, player2Score, playerScore);");
-			break;
-		case 'g':
-			canServe = true;
-			playerServe();
-			break;
-		}
-	}
+	java.util.Timer timer = new java.util.Timer();
+	java.util.Timer timerBall = new java.util.Timer();
+	java.util.Timer timerS = new java.util.Timer();
+	java.util.Timer timerR = new java.util.Timer();
 
-	public void serverRacketMove(int direction) {
-		switch (direction) {
-		case 1:
+	TimerTask getRequest = new TimerTask() {
+		public void run() {
+			try {
+				request = Server.getRequestClient(socket);
+			} catch (IOException e) {
+			}
+			getRequest.cancel();
+		}
+	};
+
+	TimerTask goUp = new TimerTask() {
+		public void run() {
+			if (clientRacket_Y > TABLE_TOP) {
+				clientRacket_Y -= RACKET_INCREMENT;
+			}
+			table.setPlayer2Racket_Y(clientRacket_Y);
+		}
+	};
+
+	TimerTask goDown = new TimerTask() {
+		public void run() {
+			if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+				clientRacket_Y += RACKET_INCREMENT;
+			}
+			table.setPlayer2Racket_Y(clientRacket_Y);
+		}
+	};
+
+	TimerTask goUpS = new TimerTask() {
+		public void run() {
 			if (serverRacket_Y > TABLE_TOP) {
 				serverRacket_Y -= RACKET_INCREMENT;
 			}
-			break;
-		case -1:
+			table.setPlayerRacket_Y(serverRacket_Y);
+		}
+	};
+
+	TimerTask goDownS = new TimerTask() {
+		public void run() {
 			if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
 				serverRacket_Y += RACKET_INCREMENT;
 			}
-			break;
+			table.setPlayerRacket_Y(serverRacket_Y);
 		}
-		table.setPlayerRacket_Y(serverRacket_Y);
+	};
+
+	// Server works
+	public void workServer(final Socket socket) throws IOException {
+		if (request != 0) {
+			switch (request) {
+			case 'b':
+				Server.sendBall(socket, ballX, ballY);
+				break;
+			case 'u':
+				if (!startTimer) {
+					goUp = new TimerTask() {
+						public void run() {
+							if (clientRacket_Y > TABLE_TOP) {
+								clientRacket_Y -= RACKET_INCREMENT;
+							}
+							table.setPlayer2Racket_Y(clientRacket_Y);
+						}
+					};
+					timer.schedule(goUp, 0, timeMove);
+					startTimer = true;
+					pressUp = true;
+				} else if (pressUp) {
+					goUp.cancel();
+					startTimer = false;
+					pressUp = false;
+				}
+				break;
+			case 'd':
+				if (!startTimer) {
+					goDown = new TimerTask() {
+						public void run() {
+							if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+								clientRacket_Y += RACKET_INCREMENT;
+							}
+							table.setPlayer2Racket_Y(clientRacket_Y);
+						}
+					};
+					timer.schedule(goDown, 0, timeMove);
+					startTimer = true;
+					pressDown = true;
+				} else if (pressDown) {
+					goDown.cancel();
+					startTimer = false;
+					pressDown = false;
+				}
+				break;
+			case 'g':
+				canServe = true;
+				playerServe();
+				break;
+			case 'e':
+				socket.close();
+				break;
+			}
+			request = 0;
+			getRequest = new TimerTask() {
+				public void run() {
+					try {
+						request = Server.getRequestClient(socket);
+					} catch (IOException e) {
+					}
+					getRequest.cancel();
+				}
+			};
+			timerR.schedule(getRequest, 0);
+		}
 	}
 
 	public void setDelay() {
@@ -117,14 +197,34 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 	// Обязательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
-		int directionUp = 1;
-		int directionDown = -1;
-		if (e.getKeyCode() == e.VK_UP || serverPressUp) {
-			serverRacketMove(directionUp);
-			serverPressUp = true;
-		} else if (e.getKeyCode() == e.VK_DOWN || serverPressDown) {
-			serverRacketMove(directionDown);
-			serverPressDown = true;
+		if (e.getKeyCode() == e.VK_UP) {
+			if (!startTimerS) {
+				startTimerS = true;
+				goUpS = new TimerTask() {
+					public void run() {
+						if (serverRacket_Y > TABLE_TOP) {
+							serverRacket_Y -= RACKET_INCREMENT;
+						}
+						table.setPlayerRacket_Y(serverRacket_Y);
+					}
+				};
+				Server.serverUp(socket);
+				timerS.schedule(goUpS, 0, timeMove);
+			}
+		} else if (e.getKeyCode() == e.VK_DOWN) {
+			if (!startTimerS) {
+				startTimerS = true;
+				goDownS = new TimerTask() {
+					public void run() {
+						if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+							serverRacket_Y += RACKET_INCREMENT;
+						}
+						table.setPlayerRacket_Y(serverRacket_Y);
+					}
+				};
+				Server.serverDown(socket);
+				timerS.schedule(goDownS, 0, timeMove);
+			}
 		} else if ('n' == key || 'N' == key) {
 			if (!gameRun) {
 				startNewGame();
@@ -141,10 +241,14 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == e.VK_UP) {
-			serverPressUp = false;
+			goUpS.cancel();
+			Server.serverUp(socket);
+			startTimerS = false;
 		}
 		if (e.getKeyCode() == e.VK_DOWN) {
-			serverPressDown = false;
+			goDownS.cancel();
+			Server.serverDown(socket);
+			startTimerS = false;
 		}
 	}
 
@@ -158,27 +262,31 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		table.setMessageText("Score Player 2: 0 Player 1: 0");
 		canServe = true;
 		playerServe();
+		Server.startNewGame(socket);
 	}
 
 	// Завершить игру
 	public void endGame() {
+		Server.serverExit(socket);
 		System.exit(0);
 	}
 
 	// Вернуться в меню
 	public void backToMenu() {
 		PingPongGreenTable.f.dispose();
+		Server.serverExit(socket);
 		try {
 			socket.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 		}
-		isActive = false;
-		int codeMenu = 0;
-		new Menu(codeMenu);
+		if (isActive) {
+			isActive = false;
+			int codeMenu = 0;
+			new Menu(codeMenu);
+		}
 	}
 
-	private void goLeft(boolean canBounce) {
+	private void goLeft() {
 		if (movingLeft && ballX > BALL_MIN_X) {
 			canBounce = (ballY >= clientRacket_Y && ballY < (clientRacket_Y + RACKET_LENGTH));
 			ballX -= BALL_INCREMENT;
@@ -192,7 +300,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void goRight(boolean canBounce) {
+	private void goRight() {
 		if (!movingLeft && ballX <= BALL_MAX_X) {
 			canBounce = (ballY >= serverRacket_Y
 					&& ballY <= (serverRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
@@ -235,16 +343,34 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		}
 	}
 
+	TimerTask ballMove = new TimerTask() {
+		public void run() {
+			if (ballServed) {
+				// Мяч движется влево?
+				goLeft();
+				// Мяч движется вправо?
+				goRight();
+				// Приостановить
+				setDelay();
+				// Обновить счет
+				updateScore();
+				// Отскок мяча
+				ballBounce();
+			}
+		}
+	};
+
 	public void run() {
-		boolean canBounce = false;
-		while (true) {
+		timerBall.schedule(ballMove, 0, ballSpeed);
+		timerR.schedule(getRequest, 0);
+		while (isActive) {
 			if (socket == null) {
 				JOptionPane.showMessageDialog(null,
 						"No clients connected. Back to menu");
 				backToMenu();
 			}
 			try {
-				if (socket.isClosed()) {
+				if (socket.isClosed() && isActive) {
 					JOptionPane.showMessageDialog(null,
 							"Connection is lost. Back to menu");
 					backToMenu();
@@ -252,28 +378,10 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 			} catch (Exception e) {
 				// NULL Exception
 			}
-
-			if (!isActive) {
-				return;
-			}
 			// work to client
 			try {
 				workServer(socket);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (ballServed) {
-				// Мяч движется влево?
-				goLeft(canBounce);
-				// Мяч движется вправо?
-				goRight(canBounce);
-				// Приостановить
-				setDelay();
-				// Обновить счет
-				updateScore();
-				// Отскок мяча
-				ballBounce();
 			}
 		}
 	}
@@ -283,6 +391,7 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 		if (canServe) {
 			ballServed = true;
 			if (!clientServe) {
+				Server.sendServe(socket);
 				movingLeft = true;
 				ballX = PLAYER_RACKET_X - 1;
 				ballY = serverRacket_Y;

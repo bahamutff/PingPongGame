@@ -4,6 +4,8 @@ import java.net.*;
 import java.io.*;
 
 import screens.GameConstants.*;
+
+import java.util.Scanner;
 import java.util.TimerTask;
 
 import message.Message;
@@ -71,6 +73,17 @@ public class Client {
 		return socket;
 	}
 
+	public static char getRequestServer(Socket socket) throws IOException {
+		String str = in.readLine();
+		char data = 0;
+		if (str != null) {
+			data = str.charAt(0);
+			return data;
+		} else {
+			return data;
+		}
+	}
+
 	public static void sendRequestServer(Socket socket, char data)
 			throws IOException {
 		if (!socket.isClosed()) {
@@ -107,9 +120,7 @@ public class Client {
 		sendRequestServer(socket, 'b'); // символ 'b' означает запрос
 		// координат м€ча
 		int x = getIntServer(socket);
-		System.out.println(x);
 		int y = getIntServer(socket);
-		System.out.println(y);
 		Coord ball = new Coord(x, y);
 		return ball;
 	}
@@ -121,24 +132,31 @@ public class Client {
 		return y;
 	}
 
-	public static void sendClientY(Socket socket, int y) throws IOException {
-		sendRequestServer(socket, 'i'); // символ 'i' означает запрос на
-										// передачу
-		// y координаты игрока
-		sendIntServer(socket, y);
+	public static void clientUp(Socket socket) {
+		try {
+			sendRequestServer(socket, 'u'); // символ 'u' - таймер на движение
+											// вверх
+		} catch (Exception e) {
+		}
 	}
 
-	public static Score getScore(Socket socket) throws IOException {
-		sendRequestServer(socket, 's'); // символ 's' означает запрос
-		// текущего счета
-		int scoreClient = getIntServer(socket);
-		int scoreServer = getIntServer(socket);
-		Score score = new Score(scoreClient, scoreServer);
-		return score;
+	public static void clientDown(Socket socket) {
+		try {
+			sendRequestServer(socket, 'd'); // символ 'd' - таймер на движение
+											// вниз
+		} catch (IOException e) {
+		}
 	}
 
 	public static void sendServe(Socket socket) throws IOException {
 		sendRequestServer(socket, 'g');
+	}
+
+	public static void clientExit(Socket socket) {
+		try {
+			sendRequestServer(socket, 'e');
+		} catch (IOException e) {
+		}
 	}
 
 } // /:~
