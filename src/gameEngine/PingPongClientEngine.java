@@ -161,6 +161,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				break;
 			}
 			request = 0;
+			getRequest.cancel();
 			getRequest = new TimerTask() {
 				public void run() {
 					try {
@@ -227,8 +228,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				try {
 					Client.sendServe(socket);
 				} catch (IOException e1) {
-				} finally {
-					canServe = false;
 				}
 				table.setBallPosition(ballX, ballY);
 				canServe = false;
@@ -405,9 +404,11 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		if (clientScore == WINNING_SCORE) {
 			table.setMessageText("Player 2 won! " + clientScore + ":"
 					+ serverScore);
+			canServe = false;
 		} else if (serverScore == WINNING_SCORE) {
 			table.setMessageText("Player 1 won! " + serverScore + ":"
 					+ clientScore);
+			canServe = false;
 		} else {
 			table.setMessageText("Player 2: " + clientScore + "   "
 					+ "Player 1: " + serverScore);

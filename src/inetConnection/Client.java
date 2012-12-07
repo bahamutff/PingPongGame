@@ -74,19 +74,23 @@ public class Client {
 	}
 
 	public static char getRequestServer(Socket socket) throws IOException {
-		String str = in.readLine();
-		char data = 0;
-		if (str != null) {
-			data = str.charAt(0);
-			return data;
+		if (socket != null) {
+			String str = in.readLine();
+			char data = 0;
+			if (str != null) {
+				data = str.charAt(0);
+				return data;
+			} else {
+				return data;
+			}
 		} else {
-			return data;
+			return 0;
 		}
 	}
 
 	public static void sendRequestServer(Socket socket, char data)
 			throws IOException {
-		if (!socket.isClosed()) {
+		if (socket != null && !socket.isClosed()) {
 			out.println(data);
 		}
 	}

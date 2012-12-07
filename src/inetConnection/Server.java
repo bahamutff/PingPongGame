@@ -68,7 +68,7 @@ public class Server {
 
 	public static void sendRequestClient(Socket socket, char data)
 			throws IOException {
-		if (!socket.isClosed()) {
+		if (socket != null && !socket.isClosed()) {
 			// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
 			out.println(data);
 		}
@@ -91,13 +91,17 @@ public class Server {
 	}
 
 	public static char getRequestClient(Socket socket) throws IOException {
-		String str = in.readLine();
-		char data = 0;
-		if (str != null) {
-			data = str.charAt(0);
-			return data;
+		if (socket != null) {
+			String str = in.readLine();
+			char data = 0;
+			if (str != null) {
+				data = str.charAt(0);
+				return data;
+			} else {
+				return data;
+			}
 		} else {
-			return data;
+			return 0;
 		}
 	}
 

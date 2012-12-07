@@ -420,11 +420,13 @@ public class PingPongServerEngine implements Runnable, KeyListener,
 					+ serverScore);
 			ballServed = false;
 			gameRun = false;
+			canServe = false;
 		} else if (serverScore == WINNING_SCORE) {
 			table.setMessageText("Player 1 won! " + serverScore + ":"
 					+ clientScore);
 			ballServed = false;
 			gameRun = false;
+			canServe = false;
 		} else {
 			table.setMessageText("Player 2: " + clientScore + "   "
 					+ "Player 1: " + serverScore);
