@@ -2,10 +2,6 @@ package inetConnection;
 
 import java.net.*;
 import java.io.*;
-
-import screens.GameConstants.*;
-
-import java.util.Scanner;
 import java.util.TimerTask;
 
 import message.Message;
@@ -120,22 +116,6 @@ public class Client {
 	}
 
 	// методы передачи и получени€ необходимых данных с сервера
-	public static Coord getBall(Socket socket) throws IOException {
-		sendRequestServer(socket, 'b'); // символ 'b' означает запрос
-		// координат м€ча
-		int x = getIntServer(socket);
-		int y = getIntServer(socket);
-		Coord ball = new Coord(x, y);
-		return ball;
-	}
-
-	public static int getServerY(Socket socket) throws IOException {
-		sendRequestServer(socket, 'p'); // символ 'p' означает запрос
-		// y координаты соперника
-		int y = getIntServer(socket);
-		return y;
-	}
-
 	public static void clientUp(Socket socket) {
 		try {
 			sendRequestServer(socket, 'u'); // символ 'u' - таймер на движение

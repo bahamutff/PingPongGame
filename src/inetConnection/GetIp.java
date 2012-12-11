@@ -1,7 +1,6 @@
 package inetConnection;
 
 import java.net.*;
-import java.io.*;
 
 public class GetIp {
 

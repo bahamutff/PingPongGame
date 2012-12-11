@@ -34,6 +34,7 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		worker.start();
 	}
 
+	// Timers
 	java.util.Timer timer1 = new java.util.Timer(); // Player 1
 	java.util.Timer timer2 = new java.util.Timer(); // Player 2
 	// Player 1
@@ -48,7 +49,7 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 
 	TimerTask goDown1 = new TimerTask() {
 		public void run() {
-			if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+			if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + TABLE_TOP) {
 				playerRacket_Y += RACKET_INCREMENT;
 			}
 			table.setPlayerRacket_Y(playerRacket_Y);
@@ -67,32 +68,12 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 
 	TimerTask goDown2 = new TimerTask() {
 		public void run() {
-			if (player2Racket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+			if (player2Racket_Y + RACKET_LENGTH < TABLE_BOTTOM + TABLE_TOP) {
 				player2Racket_Y += RACKET_INCREMENT;
 			}
 			table.setPlayer2Racket_Y(player2Racket_Y);
 		}
 	};
-
-	public void setDelay() {
-		try {
-			Thread.sleep(SLEEP_TIME);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void setBounce() {
-		// целое число в диапазоне [-5, 5]
-		Random r = new Random();
-		int k = -5 + r.nextInt(10 + 1);
-		if (k > 0) {
-			verticalSlide = 1;
-		}
-		if (k < 0) {
-			verticalSlide = -1;
-		}
-	}
 
 	// Обязательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
@@ -111,7 +92,8 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		} else if (!startTimer1 && e.getKeyCode() == e.VK_DOWN) {
 			goDown1 = new TimerTask() {
 				public void run() {
-					if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+					if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM
+							+ TABLE_TOP) {
 						playerRacket_Y += RACKET_INCREMENT;
 					}
 					table.setPlayerRacket_Y(playerRacket_Y);
@@ -135,7 +117,8 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		} else if (!startTimer2 && ('d' == key || 'D' == key)) {
 			goDown2 = new TimerTask() {
 				public void run() {
-					if (player2Racket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+					if (player2Racket_Y + RACKET_LENGTH < TABLE_BOTTOM
+							+ TABLE_TOP) {
 						player2Racket_Y += RACKET_INCREMENT;
 					}
 					table.setPlayer2Racket_Y(player2Racket_Y);
@@ -175,6 +158,39 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 	public void keyTyped(KeyEvent e) {
 	}
 
+	private void setServe() {
+		// целое число в диапазоне [-5, 5]
+		Random r = new Random();
+		int k = -5 + r.nextInt(10 + 1);
+		if (k > 0) {
+			verticalSlide = 1;
+		}
+		if (k < 0) {
+			verticalSlide = -1;
+		}
+	}
+
+	// Подать мяч
+	private void playerServe() {
+		if (canServe) {
+			ballServed = true;
+			if (!player1Serve) {
+				movingLeft = true;
+				ballX = PLAYER_RACKET_X - BALL_RADIUS;
+				ballY = playerRacket_Y + RACKET_LENGTH / 2 - BALL_RADIUS / 2;
+				table.setPlayerRacket_Y(playerRacket_Y);
+			} else {
+				movingLeft = false;
+				ballX = LEFT_RACKET_X + RACKET_WIDTH;
+				ballY = player2Racket_Y + RACKET_LENGTH / 2 - BALL_RADIUS / 2;
+				table.setPlayer2Racket_Y(player2Racket_Y);
+			}
+			table.setBallPosition(ballX, ballY);
+			setServe();
+			canServe = false;
+		}
+	}
+
 	// Начать новую игру
 	private void startNewGame() {
 		player2Score = 0;
@@ -198,7 +214,8 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 
 	private void goLeft(boolean canBounce) {
 		if (movingLeft && ballX > BALL_MIN_X) {
-			canBounce = (ballY >= player2Racket_Y && ballY < (player2Racket_Y + RACKET_LENGTH));
+			canBounce = (ballY + BALL_RADIUS >= player2Racket_Y && ballY <= player2Racket_Y
+					+ RACKET_LENGTH);
 			ballX -= BALL_INCREMENT;
 			ballY -= verticalSlide;
 			table.setBallPosition(ballX, ballY);
@@ -206,22 +223,38 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		// Отскок
 		if (ballX <= LEFT_RACKET_X + RACKET_WIDTH && canBounce) {
 			movingLeft = false;
-			setBounce();
 		}
 	}
 
 	private void goRight(boolean canBounce) {
 		if (!movingLeft && ballX <= BALL_MAX_X) {
-			canBounce = (ballY >= playerRacket_Y
-					&& ballY <= (playerRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
+			canBounce = (ballY + BALL_RADIUS >= playerRacket_Y && ballY <= playerRacket_Y
+					+ RACKET_LENGTH);
 			ballX += BALL_INCREMENT;
 			ballY -= verticalSlide;
 			table.setBallPosition(ballX, ballY);
 			// Отскок
-			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
+			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce
+					&& ballX < PLAYER_RACKET_X) {
 				movingLeft = true;
-				setBounce();
 			}
+		}
+	}
+
+	// Задержка для быстрых компьютеров
+	public void setDelay() {
+		try {
+			Thread.sleep(SLEEP_TIME);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isBallOnTheTable() {
+		if (ballY >= BALL_MIN_Y && ballY <= BALL_MAX_Y) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -243,12 +276,26 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		}
 	}
 
-	private void ballBounce() {
-		if (ballY <= TABLE_TOP) {
-			verticalSlide = -1;
+	private void displayScore() {
+		if (player2Score == WINNING_SCORE) {
+			table.setMessageText("Player 2 won! " + player2Score + ":"
+					+ playerScore);
+			ballServed = false;
+		} else if (playerScore == WINNING_SCORE) {
+			table.setMessageText("Player 1 won! " + playerScore + ":"
+					+ player2Score);
+			ballServed = false;
+		} else {
+			table.setMessageText("Player 2: " + player2Score + "   "
+					+ "Player 1: " + playerScore);
+			canServe = true;
 		}
-		if (ballY >= TABLE_BOTTOM) {
-			verticalSlide = 1;
+	}
+
+	private void ballBounce() {
+		if (ballY <= TABLE_TOP
+				|| ballY + BALL_RADIUS >= TABLE_BOTTOM + TABLE_TOP) {
+			verticalSlide *= -1;
 		}
 	}
 
@@ -269,50 +316,4 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 			}
 		}
 	}
-
-	// Подать мяч
-	private void playerServe() {
-		if (canServe) {
-			ballServed = true;
-			if (!player1Serve) {
-				movingLeft = true;
-				ballX = PLAYER_RACKET_X - 1;
-				ballY = playerRacket_Y;
-				table.setPlayerRacket_Y(playerRacket_Y);
-			} else {
-				movingLeft = false;
-				ballX = LEFT_RACKET_X + 1;
-				ballY = player2Racket_Y;
-				table.setPlayer2Racket_Y(player2Racket_Y);
-			}
-			table.setBallPosition(ballX, ballY);
-			setBounce();
-			canServe = false;
-		}
-	}
-
-	private void displayScore() {
-		if (player2Score == WINNING_SCORE) {
-			table.setMessageText("Player 2 won! " + player2Score + ":"
-					+ playerScore);
-			ballServed = false;
-		} else if (playerScore == WINNING_SCORE) {
-			table.setMessageText("Player 1 won! " + playerScore + ":"
-					+ player2Score);
-			ballServed = false;
-		} else {
-			table.setMessageText("Player 2: " + player2Score + "   "
-					+ "Player 1: " + playerScore);
-			canServe = true;
-		}
-	}
-
-	private boolean isBallOnTheTable() {
-		if (ballY >= BALL_MIN_Y && ballY <= BALL_MAX_Y) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 }

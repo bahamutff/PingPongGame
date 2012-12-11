@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Random;
 import java.util.TimerTask;
 
 import javax.swing.JOptionPane;
@@ -50,10 +49,12 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		worker.start();
 	}
 
+	// Timers
 	java.util.Timer timer = new java.util.Timer();
 	java.util.Timer timerBall = new java.util.Timer();
 	java.util.Timer timerS = new java.util.Timer();
 	java.util.Timer timerR = new java.util.Timer();
+
 	TimerTask getRequest = new TimerTask() {
 		public void run() {
 			try {
@@ -75,7 +76,7 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 
 	TimerTask goDown = new TimerTask() {
 		public void run() {
-			if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+			if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + TABLE_TOP) {
 				clientRacket_Y += RACKET_INCREMENT;
 			}
 			table.setPlayer2Racket_Y(clientRacket_Y);
@@ -93,10 +94,27 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 
 	TimerTask goDownS = new TimerTask() {
 		public void run() {
-			if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+			if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + TABLE_TOP) {
 				serverRacket_Y += RACKET_INCREMENT;
 			}
 			table.setPlayerRacket_Y(serverRacket_Y);
+		}
+	};
+
+	TimerTask ballMove = new TimerTask() {
+		public void run() {
+			if (ballServed) {
+				// ћ€ч движетс€ влево?
+				goLeft();
+				// ћ€ч движетс€ вправо?
+				goRight();
+				// ѕриостановить
+				setDelay();
+				// ќбновить счет
+				updateScore();
+				// ќтскок м€ча
+				ballBounce();
+			}
 		}
 	};
 
@@ -104,6 +122,14 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 	public void workClient(final Socket socket) throws IOException {
 		if (request != 0) {
 			switch (request) {
+			case 'w':
+				// ѕор€док получени€ известен заранее, его можно узнать в
+				// inetConnecton.Server метод sync
+				serverRacket_Y = Client.getIntServer(socket);
+				clientRacket_Y = Client.getIntServer(socket);
+				ballX = Client.getIntServer(socket);
+				ballY = Client.getIntServer(socket);
+				break;
 			case 'u':
 				if (!startTimerS) {
 					startTimerS = true;
@@ -126,7 +152,8 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 					startTimerS = true;
 					goDownS = new TimerTask() {
 						public void run() {
-							if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+							if (serverRacket_Y + RACKET_LENGTH < TABLE_BOTTOM
+									+ TABLE_TOP) {
 								serverRacket_Y += RACKET_INCREMENT;
 							}
 							table.setPlayerRacket_Y(serverRacket_Y);
@@ -152,11 +179,11 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				break;
 			case 'g':
 				movingLeft = true;
-				ballX = PLAYER_RACKET_X - 1;
-				ballY = serverRacket_Y;
+				ballX = PLAYER_RACKET_X - BALL_RADIUS;
+				ballY = serverRacket_Y + RACKET_LENGTH / 2 - BALL_RADIUS / 2;
 				table.setPlayerRacket_Y(serverRacket_Y);
 				table.setBallPosition(ballX, ballY);
-				setServe();
+				// setServe();
 				canServe = false;
 				break;
 			}
@@ -172,14 +199,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				}
 			};
 			timerR.schedule(getRequest, 0);
-		}
-	}
-
-	public void setDelay() {
-		try {
-			Thread.sleep(SLEEP_TIME);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -207,7 +226,8 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 				pressDown = true;
 				goDown = new TimerTask() {
 					public void run() {
-						if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM + 10) {
+						if (clientRacket_Y + RACKET_LENGTH < TABLE_BOTTOM
+								+ TABLE_TOP) {
 							clientRacket_Y += RACKET_INCREMENT;
 						}
 						table.setPlayer2Racket_Y(clientRacket_Y);
@@ -222,8 +242,8 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 			if (canServe) {
 				ballServed = true;
 				movingLeft = false;
-				ballX = LEFT_RACKET_X + 1;
-				ballY = clientRacket_Y;
+				ballX = LEFT_RACKET_X + RACKET_WIDTH;
+				ballY = clientRacket_Y + RACKET_LENGTH / 2 - BALL_RADIUS / 2;
 				table.setPlayer2Racket_Y(clientRacket_Y);
 				try {
 					Client.sendServe(socket);
@@ -262,10 +282,6 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		serverScore = 0;
 		table.setMessageText("Score Player 2: 0 Player 1: 0");
 		movingLeft = true;
-		ballX = PLAYER_RACKET_X - 1;
-		ballY = serverRacket_Y;
-		table.setPlayerRacket_Y(serverRacket_Y);
-		table.setBallPosition(ballX, ballY);
 		canServe = false;
 		ballServed = true;
 	}
@@ -291,31 +307,10 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		}
 	}
 
-	private void setServe() {
-		// целое число в диапазоне [-5, 5]
-		Random r = new Random();
-		int k = -5 + r.nextInt(10 + 1);
-		if (k > 0) {
-			verticalSlide = 1;
-		}
-		if (k < 0) {
-			verticalSlide = -1;
-		}
-	}
-
-	private void ballBounce(boolean canBounce) {
-		if (ballY <= TABLE_TOP) {
-			verticalSlide = -1;
-		} else if (ballY >= TABLE_BOTTOM) {
-			verticalSlide = 1;
-		} else if (canBounce) {
-			verticalSlide *= -1;
-		}
-	}
-
 	private void goLeft() {
 		if (movingLeft && ballX > BALL_MIN_X) {
-			canBounce = (ballY >= clientRacket_Y && ballY < (clientRacket_Y + RACKET_LENGTH));
+			canBounce = (ballY + BALL_RADIUS >= clientRacket_Y && ballY <= clientRacket_Y
+					+ RACKET_LENGTH);
 			ballX -= BALL_INCREMENT;
 			ballY -= verticalSlide;
 			table.setBallPosition(ballX, ballY);
@@ -323,22 +318,38 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		// ќтскок
 		if (ballX <= LEFT_RACKET_X + RACKET_WIDTH && canBounce) {
 			movingLeft = false;
-			ballBounce(canBounce);
 		}
 	}
 
 	private void goRight() {
 		if (!movingLeft && ballX <= BALL_MAX_X) {
-			canBounce = (ballY >= serverRacket_Y
-					&& ballY <= (serverRacket_Y + RACKET_LENGTH) && (ballX + BALL_RADIUS) <= PLAYER_RACKET_X);
+			canBounce = (ballY + BALL_RADIUS >= serverRacket_Y && ballY <= serverRacket_Y
+					+ RACKET_LENGTH);
 			ballX += BALL_INCREMENT;
 			ballY -= verticalSlide;
 			table.setBallPosition(ballX, ballY);
 			// ќтскок
-			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce) {
+			if (ballX + BALL_RADIUS >= PLAYER_RACKET_X && canBounce
+					&& ballX < PLAYER_RACKET_X) {
 				movingLeft = true;
-				ballBounce(canBounce);
 			}
+		}
+	}
+
+	// «адержка дл€ быстрых компьютеров
+	public void setDelay() {
+		try {
+			Thread.sleep(SLEEP_TIME);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isBallOnTheTable() {
+		if (ballY >= BALL_MIN_Y && ballY <= BALL_MAX_Y) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -359,22 +370,27 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 		}
 	}
 
-	TimerTask ballMove = new TimerTask() {
-		public void run() {
-			if (ballServed) {
-				// ћ€ч движетс€ влево?
-				goLeft();
-				// ћ€ч движетс€ вправо?
-				goRight();
-				// ѕриостановить
-				setDelay();
-				// ќбновить счет
-				updateScore();
-				// ќтскок м€ча
-				ballBounce(false);
-			}
+	private void displayScore() {
+		if (clientScore == WINNING_SCORE) {
+			table.setMessageText("Player 2 won! " + clientScore + ":"
+					+ serverScore);
+			canServe = false;
+		} else if (serverScore == WINNING_SCORE) {
+			table.setMessageText("Player 1 won! " + serverScore + ":"
+					+ clientScore);
+			canServe = false;
+		} else {
+			table.setMessageText("Player 2: " + clientScore + "   "
+					+ "Player 1: " + serverScore);
 		}
-	};
+	}
+
+	private void ballBounce() {
+		if (ballY <= TABLE_TOP
+				|| ballY + BALL_RADIUS >= TABLE_BOTTOM + TABLE_TOP) {
+			verticalSlide *= -1;
+		}
+	}
 
 	public void run() {
 		timerBall.schedule(ballMove, 0, ballSpeed);
@@ -399,28 +415,4 @@ public class PingPongClientEngine implements Runnable, KeyListener,
 			}
 		}
 	}
-
-	private void displayScore() {
-		if (clientScore == WINNING_SCORE) {
-			table.setMessageText("Player 2 won! " + clientScore + ":"
-					+ serverScore);
-			canServe = false;
-		} else if (serverScore == WINNING_SCORE) {
-			table.setMessageText("Player 1 won! " + serverScore + ":"
-					+ clientScore);
-			canServe = false;
-		} else {
-			table.setMessageText("Player 2: " + clientScore + "   "
-					+ "Player 1: " + serverScore);
-		}
-	}
-
-	private boolean isBallOnTheTable() {
-		if (ballY >= BALL_MIN_Y && ballY <= BALL_MAX_Y) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 }

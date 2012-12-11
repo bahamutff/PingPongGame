@@ -60,7 +60,7 @@ public class Server {
 
 	public static void sendIntClient(Socket socket, int data)
 			throws IOException {
-		if (!socket.isClosed()) {
+		if (socket != null && !socket.isClosed()) {
 			// ¬ывод автоматически Output выталкиваетс€ PrintWriter'ом.
 			out.println(data);
 		}
@@ -106,15 +106,6 @@ public class Server {
 	}
 
 	// методы передачи и получени€ необходимых данных с клиента
-	public static void sendBall(Socket socket, int x, int y) throws IOException {
-		sendIntClient(socket, x);
-		sendIntClient(socket, y);
-	}
-
-	public static int getClientY(Socket socket) throws IOException {
-		return getIntClient(socket);
-	}
-
 	public static void serverUp(Socket socket) {
 		try {
 			sendRequestClient(socket, 'u');
@@ -153,6 +144,18 @@ public class Server {
 	public static void sendDir(Socket socket, char dir) {
 		try {
 			sendRequestClient(socket, dir);
+		} catch (IOException e) {
+		}
+	}
+
+	public static void sync(Socket socket, int server_Y, int client_Y,
+			int ballX, int ballY) {
+		try {
+			sendRequestClient(socket, 'w');
+			sendIntClient(socket, server_Y);
+			sendIntClient(socket, client_Y);
+			sendIntClient(socket, ballX);
+			sendIntClient(socket, ballY);
 		} catch (IOException e) {
 		}
 	}

@@ -25,6 +25,9 @@ public interface GameConstants {
 	public final int RACKET_INCREMENT = 5;
 	public final int RACKET_LENGTH = 40;
 	public final int RACKET_WIDTH = 5;
+	// Зона для отскока
+	public final int RACKET_ZONE_START = RACKET_LENGTH / 2 - RACKET_LENGTH / 4;
+	public final int RACKET_ZONE_END = RACKET_LENGTH / 2 + RACKET_LENGTH / 4;
 	// Player 1
 	public final int PLAYER_RACKET_X = WINDOW_WIDTH - 30;
 	public final int PLAYER_RACKET_Y_START = WINDOW_HEIGHT / 2;
@@ -42,15 +45,6 @@ public interface GameConstants {
 	public final int timeMove = 20; // 0.02 sec
 	// Скорость движение мяча в милисекундах
 	public final int ballSpeed = 1; // 0.001 sec
-
-	// Координаты
-	class Coord {
-		public int x;
-		public int y;
-
-		public Coord(int initX, int initY) {
-			x = initX;
-			y = initY;
-		}
-	}
+	// Частота обновлений/синхронизации
+	public final int freqSync = 1000; // 0.1 sec
 }
