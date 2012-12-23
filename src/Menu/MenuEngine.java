@@ -31,8 +31,6 @@ public class MenuEngine implements ActionListener {
 			parent.fStartMenu.dispose();
 			codeMenu = 2;
 			new Menu(codeMenu);
-		} else if (clickedButton == parent.optionGame) {
-
 		} else if (clickedButton == parent.exitGame) {
 			System.exit(0);
 		}
@@ -81,8 +79,8 @@ public class MenuEngine implements ActionListener {
 		}
 		// Ip option
 		if (clickedButton == parent.confirm) {
-			if (isIP(parent.getIp.getText())) {
-				parent.IP = parent.getIp.getText();
+			if (isIP(Menu.getIp.getText())) {
+				Menu.IP = Menu.getIp.getText();
 				parent.fGetIp.dispose();
 				codeEngine = 3;
 				try {
@@ -98,6 +96,17 @@ public class MenuEngine implements ActionListener {
 			parent.fGetIp.dispose();
 			codeMenu = 0;
 			new Menu(codeMenu);
+		}
+		// Правила
+		if (clickedButton == parent.rulesGame) {
+			JOptionPane.showMessageDialog(null, "Control:\n "
+					+ "s - serve the ball   " + "n - start new game\n"
+					+ "b - back to main menu   " + "q - quit\n" + "\n"
+					+ "Move button:\n" + "\u2191 - up right player   "
+					+ "\u2193 - down right player\n" + "e - up left player   "
+					+ "d - down left player\n" + "\n" + "Rules of the game\n"
+					+ "task: getting the ball to the enemy\n"
+					+ "Game goes to 21 points\n", "Rules and control", 3);
 		}
 	}
 

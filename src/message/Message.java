@@ -8,13 +8,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Message {
-	// Search server
+	// Поиск серверов
 	static JFrame searchMessage = new JFrame("Please wait");
 	private static boolean searchWasCreate = false;
-	// Wait client
+	// Ожидание клиента
 	static JFrame waitMessage = new JFrame("Please wait");
 	private static boolean waitWasCreate = false;
-	//
+	// Текстовые поля для сообщений
 	static Label searchingMessage;
 	static Label waitingMessage;
 

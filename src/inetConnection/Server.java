@@ -17,7 +17,7 @@ public class Server {
 	public static Socket createServer() throws IOException {
 		final ServerSocket s = new ServerSocket(PORT);
 
-		// Timer for close waitnig client
+		// Таймер для закрытия ожидания клиентов
 		final java.util.Timer timerClose = new java.util.Timer();
 		TimerTask closeWaiting = new TimerTask() {
 			public void run() {
@@ -42,7 +42,6 @@ public class Server {
 		} catch (Exception e) {
 			s.close();
 			socket.close();
-			// !!!!!!!!!!!!!!
 		} finally {
 			Message.closeWaitMessage();
 			System.out.println("Finally");
@@ -58,106 +57,18 @@ public class Server {
 		return socket;
 	}
 
-	public static void sendIntClient(Socket socket, int data)
-			throws IOException {
+	public static void sendRequestClient(Socket socket, String data) {
 		if (socket != null && !socket.isClosed()) {
 			// Вывод автоматически Output выталкивается PrintWriter'ом.
 			out.println(data);
 		}
 	}
 
-	public static void sendRequestClient(Socket socket, char data)
-			throws IOException {
+	public static String getRequestClient(Socket socket) throws IOException {
 		if (socket != null && !socket.isClosed()) {
-			// Вывод автоматически Output выталкивается PrintWriter'ом.
-			out.println(data);
-		}
-	}
-
-	public static int getIntClient(Socket socket) throws IOException {
-		int data = 0;
-		if (!socket.isClosed()) {
-			try {
-				String str = in.readLine();
-				data = Integer.parseInt(str);
-			} catch (Exception e) {
-				socket.close();
-				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			return data;
+			return in.readLine();
 		} else {
-			return 0;
+			return null;
 		}
 	}
-
-	public static char getRequestClient(Socket socket) throws IOException {
-		if (socket != null) {
-			String str = in.readLine();
-			char data = 0;
-			if (str != null) {
-				data = str.charAt(0);
-				return data;
-			} else {
-				return data;
-			}
-		} else {
-			return 0;
-		}
-	}
-
-	// методы передачи и получения необходимых данных с клиента
-	public static void serverUp(Socket socket) {
-		try {
-			sendRequestClient(socket, 'u');
-		} catch (IOException e) {
-		}
-	}
-
-	public static void serverDown(Socket socket) {
-		try {
-			sendRequestClient(socket, 'd');
-		} catch (IOException e) {
-		}
-	}
-
-	public static void startNewGame(Socket socket) {
-		try {
-			Server.sendRequestClient(socket, 'n');
-		} catch (IOException e) {
-		}
-	}
-
-	public static void serverExit(Socket socket) {
-		try {
-			Server.sendRequestClient(socket, 'e');
-		} catch (IOException e) {
-		}
-	}
-
-	public static void sendServe(Socket socket) {
-		try {
-			sendRequestClient(socket, 'g');
-		} catch (IOException e) {
-		}
-	}
-
-	public static void sendDir(Socket socket, char dir) {
-		try {
-			sendRequestClient(socket, dir);
-		} catch (IOException e) {
-		}
-	}
-
-	public static void sync(Socket socket, int server_Y, int client_Y,
-			int ballX, int ballY) {
-		try {
-			sendRequestClient(socket, 'w');
-			sendIntClient(socket, server_Y);
-			sendIntClient(socket, client_Y);
-			sendIntClient(socket, ballX);
-			sendIntClient(socket, ballY);
-		} catch (IOException e) {
-		}
-	}
-
-} // /:~
+}

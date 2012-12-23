@@ -32,7 +32,7 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 		worker.start();
 	}
 
-	// Timers
+	// Таймеры для движения
 	java.util.Timer timer = new java.util.Timer();
 	TimerTask goUp = new TimerTask() {
 		public void run() {
@@ -55,7 +55,7 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 	// Обязательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
-		if (!startTimer && e.getKeyCode() == e.VK_UP) {
+		if (!startTimer && e.getKeyCode() == KeyEvent.VK_UP) {
 			goUp = new TimerTask() {
 				public void run() {
 					if (playerRacket_Y > TABLE_TOP) {
@@ -66,7 +66,7 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 			};
 			timer.schedule(goUp, 0, timeMove);
 			startTimer = true;
-		} else if (!startTimer && e.getKeyCode() == e.VK_DOWN) {
+		} else if (!startTimer && e.getKeyCode() == KeyEvent.VK_DOWN) {
 			goDown = new TimerTask() {
 				public void run() {
 					if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM
@@ -90,11 +90,11 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 	}
 
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == e.VK_UP) {
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
 			goUp.cancel();
 			startTimer = false;
 		}
-		if (e.getKeyCode() == e.VK_DOWN) {
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			goDown.cancel();
 			startTimer = false;
 		}
@@ -180,7 +180,6 @@ public class PingPongTrainingEngine implements Runnable, KeyListener,
 
 	private void computerMove() {
 		computerRacket_Y += 3 * computerDir;
-		// computerRacket_Y += RACKET_INCREMENT * computerDir;
 		if (computerRacket_Y <= TABLE_TOP
 				|| computerRacket_Y + RACKET_LENGTH >= TABLE_BOTTOM + TABLE_TOP) {
 			computerDir *= -1;

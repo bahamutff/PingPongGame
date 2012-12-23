@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -11,10 +12,10 @@ import java.awt.Label;
 
 public class Menu {
 	public static String IP = null;
-	// Start Menu
+	// Стартовое меню
 	JButton startGame = new JButton("Start game");
 	JButton lanGame = new JButton("Lan game");
-	JButton optionGame = new JButton("Option");
+	JButton rulesGame = new JButton("Rules");
 	JButton exitGame = new JButton("Exit");
 	JFrame fStartMenu = new JFrame("Ping Pong Game");
 	GridLayout glStart = new GridLayout(4, 1);
@@ -46,14 +47,14 @@ public class Menu {
 			windowContent.setLayout(glStart);
 			windowContent.add(startGame);
 			windowContent.add(lanGame);
-			windowContent.add(optionGame);
+			windowContent.add(rulesGame);
 			windowContent.add(exitGame);
 			startGame.addActionListener(mE);
 			lanGame.addActionListener(mE);
-			optionGame.addActionListener(mE);
+			rulesGame.addActionListener(mE);
 			exitGame.addActionListener(mE);
 			fStartMenu.setContentPane(windowContent);
-			fStartMenu.setDefaultCloseOperation(fStartMenu.DO_NOTHING_ON_CLOSE);
+			fStartMenu.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			fStartMenu.setSize(250, 200);
 			fStartMenu.setLocationRelativeTo(null);
 			fStartMenu.setResizable(false);
@@ -68,7 +69,7 @@ public class Menu {
 			back.addActionListener(mE);
 			fModeSelection.setContentPane(windowContent);
 			fModeSelection
-					.setDefaultCloseOperation(fModeSelection.DO_NOTHING_ON_CLOSE);
+					.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			fModeSelection.setSize(250, 200);
 			fModeSelection.setLocationRelativeTo(null);
 			fModeSelection.setResizable(false);
@@ -83,7 +84,7 @@ public class Menu {
 			backOutLan.addActionListener(mE);
 			fLanSelection.setContentPane(windowContent);
 			fLanSelection
-					.setDefaultCloseOperation(fLanSelection.DO_NOTHING_ON_CLOSE);
+					.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			fLanSelection.setSize(250, 200);
 			fLanSelection.setLocationRelativeTo(null);
 			fLanSelection.setResizable(false);
@@ -98,7 +99,7 @@ public class Menu {
 			confirm.addActionListener(mE);
 			backOutIp.addActionListener(mE);
 			fGetIp.setContentPane(windowContent);
-			fGetIp.setDefaultCloseOperation(fGetIp.DO_NOTHING_ON_CLOSE);
+			fGetIp.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			fGetIp.setSize(350, 100);
 			fGetIp.setLocationRelativeTo(null);
 			fGetIp.setResizable(false);

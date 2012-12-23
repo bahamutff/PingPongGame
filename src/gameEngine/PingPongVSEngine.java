@@ -34,10 +34,10 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		worker.start();
 	}
 
-	// Timers
-	java.util.Timer timer1 = new java.util.Timer(); // Player 1
-	java.util.Timer timer2 = new java.util.Timer(); // Player 2
-	// Player 1
+	// Таймеры для ракеток игроков
+	java.util.Timer timer1 = new java.util.Timer(); // игрок 1
+	java.util.Timer timer2 = new java.util.Timer(); // игрок 2
+	// Игрок 1
 	TimerTask goUp1 = new TimerTask() {
 		public void run() {
 			if (playerRacket_Y > TABLE_TOP) {
@@ -56,7 +56,7 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 		}
 	};
 
-	// Player 2
+	// Игрок 2
 	TimerTask goUp2 = new TimerTask() {
 		public void run() {
 			if (player2Racket_Y > TABLE_TOP) {
@@ -78,7 +78,7 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 	// Обязательные методы интерфейса KeyListener
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
-		if (!startTimer1 && e.getKeyCode() == e.VK_UP) {
+		if (!startTimer1 && e.getKeyCode() == KeyEvent.VK_UP) {
 			goUp1 = new TimerTask() {
 				public void run() {
 					if (playerRacket_Y > TABLE_TOP) {
@@ -89,7 +89,7 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 			};
 			timer1.schedule(goUp1, 0, timeMove);
 			startTimer1 = true;
-		} else if (!startTimer1 && e.getKeyCode() == e.VK_DOWN) {
+		} else if (!startTimer1 && e.getKeyCode() == KeyEvent.VK_DOWN) {
 			goDown1 = new TimerTask() {
 				public void run() {
 					if (playerRacket_Y + RACKET_LENGTH < TABLE_BOTTOM
@@ -137,11 +137,11 @@ public class PingPongVSEngine implements Runnable, KeyListener, GameConstants {
 
 	public void keyReleased(KeyEvent e) {
 		char key = e.getKeyChar();
-		if (e.getKeyCode() == e.VK_UP) {
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
 			goUp1.cancel();
 			startTimer1 = false;
 		}
-		if (e.getKeyCode() == e.VK_DOWN) {
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			goDown1.cancel();
 			startTimer1 = false;
 		}
